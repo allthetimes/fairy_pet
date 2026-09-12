@@ -10,4 +10,7 @@ contextBridge.exposeInMainWorld('fairyAPI', {
   setConfig: (patch) => ipcRenderer.invoke('set-config', patch),
   quit: () => ipcRenderer.send('quit'),
   onCommand: (cb) => ipcRenderer.on('command', (_e, name) => cb(name)),
+  // 全屏光标位置广播（30Hz），用于视线跟随
+  onCursorMove: (cb) => ipcRenderer.on('cursor-pos', (_e, p) => cb(p)),
+  setCursorBroadcast: (enable) => ipcRenderer.send('cursor-broadcast', !!enable),
 });

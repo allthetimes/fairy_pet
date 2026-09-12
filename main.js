@@ -17,6 +17,8 @@ let dragTimer = null;
 let dragOffset = { x: 0, y: 0 };
 let mouseIgnored = true;
 let watchdog = null;
+let cursorTimer = null;        // 30Hz 推送全屏光标位置给渲染层做视线跟随
+let cursorBroadcastEnabled = true;
 
 const DEFAULTS = {
   x: null,            // null = 首次启动落在右下角
@@ -109,8 +111,10 @@ function createWindow() {
   });
   win.webContents.on('render-process-gone', (_e, d) =>
     log('FATAL: render-process-gone', d.reason));
-  win.webContents.on('did-finish-load', () =>
-    log('renderer loaded'));
+  win.webContents.on('did-finish-load', () => {
+    log('renderer loaded');
+    startCursorBroadcast();
+  });
   win.webContents.on('console-message', (_e, level, msg) => {
     if (level >= 2) log('renderer console:', level, msg);
   });
@@ -146,6 +150,34 @@ function startWatchdog() {
       win.setIgnoreMouseEvents(true, { forward: true });
     }
   }, 250);
+}
+
+/* 全屏光标位置广播：渲染层需要做"视线跟随"，但 electron 窗口平时
+   setIgnoreMouseEvents(true) 时鼠标在窗外收不到任何事件。这里走主进程
+   screen.getCursorScreenPoint()，~30Hz 推给渲染层。 */
+function startCursorBroadcast() {
+  clearInterval(cursorTimer);
+  cursorTimer = setInterval(() => {
+    if (!win || win.isDestroyed() || !cursorBroadcastEnabled) return;
+    if (!win.webContents || win.webContents.isDestroyed()) return;
+    try {
+      const p = screen.getCursorScreenPoint();
+      const b = win.getBounds();
+      const wa = screen.getPrimaryDisplay().workArea;
+      win.webContents.send('cursor-pos', {
+        x: p.x,
+        y: p.y,
+        winX: b.x,
+        winY: b.y,
+        winW: b.width,
+        winH: b.height,
+        scrW: wa.width,
+        scrH: wa.height,
+        scrOx: wa.x,
+        scrOy: wa.y,
+      });
+    } catch { /* 窗口刚被关的瞬间会抛，吞掉 */ }
+  }, 33);   // ≈30Hz
 }
 
 /* ---------------- IPC ---------------- */
@@ -234,6 +266,12 @@ ipcMain.on('context-menu', () => {
 
 ipcMain.on('quit', () => app.quit());
 
+/* 渲染层可临时关掉广播（拖拽自身时不需要视线跟随，且 30Hz 会浪费 CPU） */
+ipcMain.on('cursor-broadcast', (_e, enable) => {
+  cursorBroadcastEnabled = !!enable;
+  if (cursorBroadcastEnabled && win && !win.isDestroyed()) startCursorBroadcast();
+});
+
 /* ---------------- 生命周期 ---------------- */
 
 if (!app.requestSingleInstanceLock()) {
@@ -257,5 +295,6 @@ if (!app.requestSingleInstanceLock()) {
   app.on('before-quit', () => {
     clearInterval(watchdog);
     clearInterval(dragTimer);
+    clearInterval(cursorTimer);
   });
 }

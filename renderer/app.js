@@ -12,7 +12,7 @@
 const api = window.fairyAPI || {
   dragStart() {}, dragEnd() {}, setIgnoreMouse() {}, openMenu() {},
   getConfig: async () => ({ scale: 1, autoTalk: false }),
-  onCommand() {},
+  onCommand() {}, onCursorMove() {}, setCursorBroadcast() {},
 };
 
 const $ = (s) => document.querySelector(s);
@@ -154,27 +154,31 @@ function scheduleAutoTalk(delay) {
   }, delay ?? rand(50000, 110000));
 }
 
-/* ---------------- 视线跟随（鼠标在窗口附近时启动） ---------------- */
+/* ---------------- 视线跟随（全屏光标，主进程 30Hz 推送） ----------------
+   Electron 窗口平时 setIgnoreMouseEvents(true)，鼠标在窗外收不到任何
+   mousemove 事件。这里用主进程的 screen.getCursorScreenPoint() 替代。
+   几何：光标相对 pet 中心，按屏幕工作区半宽归一化；超 3 屏宽回到原位。 */
 
-function updateGaze(x, y) {
-  const r = hit.getBoundingClientRect();
-  if (!r.width) return;
-  const cx = r.left + r.width / 2;
-  const cy = r.top + r.height / 2;
+const GAZE_MAX_PX = 5;        // SVG 用户单位（克制）
+const GAZE_FAR_FACTOR = 3;    // 距 pet 中心 > scrW*3/factor 时回正（≈1.5 屏）
 
-  // 归一化偏移
-  let nx = (x - cx) / (r.width / 2);
-  let ny = (y - cy) / (r.height / 2);
+function updateGazeFromScreen(p) {
+  if (!p || !gaze || !p.winW) return;
+  const cx = p.winX + p.winW / 2;
+  const cy = p.winY + p.winH / 2;
+  const halfScrW = Math.max(1, p.scrW / 2);
+  const halfScrH = Math.max(1, p.scrH / 2);
+
+  let nx = (p.x - cx) / halfScrW;
+  let ny = (p.y - cy) / halfScrH;
   const len = Math.hypot(nx, ny) || 1;
   if (len > 1) { nx /= len; ny /= len; }
 
-  // 鼠标离窗口很远（>2 屏宽度）时不跟随，回到原位
-  const dist = Math.hypot(x - cx, y - cy);
-  const farAway = dist > r.width * 2;
-  if (farAway) { nx = 0; ny = 0; }
+  // 离 pet 很远时回正
+  const dist = Math.hypot(p.x - cx, p.y - cy);
+  if (dist > p.scrW * GAZE_FAR_FACTOR / 2) { nx = 0; ny = 0; }
 
-  const max = 5;   // SVG 用户单位（第一版 7.5 偏大；现在更克制）
-  gaze.style.transform = `translate(${(nx * max).toFixed(2)}px, ${(ny * max).toFixed(2)}px)`;
+  gaze.style.transform = `translate(${(nx * GAZE_MAX_PX).toFixed(2)}px, ${(ny * GAZE_MAX_PX).toFixed(2)}px)`;
 }
 
 /* ---------------- 命中判定 ---------------- */
@@ -244,9 +248,8 @@ function bindEvents() {
     api.openMenu();
   });
 
-  // 鼠标移动：视线 + 穿透判定
+  // 鼠标移动：穿透判定（视线跟随走 onCursorMove 主进程 30Hz 通道）
   document.addEventListener('mousemove', (e) => {
-    updateGaze(e.clientX, e.clientY);
     if (dragging) return;
     const p = overPet(e.clientX, e.clientY) || overBubble(e.clientX, e.clientY);
     if (p !== lastInteractive) {
@@ -307,6 +310,9 @@ function applyScale() {
 
   applyScale();
   bindEvents();
+  // 订阅主进程 30Hz 全屏光标广播
+  api.onCursorMove(updateGazeFromScreen);
+  api.setCursorBroadcast(true);
   scheduleBlink();
   scheduleAutoTalk(72000);
 
