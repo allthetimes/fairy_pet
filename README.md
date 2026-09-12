@@ -125,7 +125,12 @@ fairy_pet/
 ├── package.json              # Electron 44
 ├── assets/                   # 静态资源（官方参考立绘在 npc_fairy_ref.png）
 ├── docs/process/             # 重要过程图（提交到 git）
-├── *.py                      # 全部逐帧分析脚本（可复跑，提交到 git）
+├── tools/                    # 逐帧分析工具集（5 模块，约 1900 行；提交到 git）
+│   ├── common.py             # 共享：路径 / 颜色 / 帧 IO / 极坐标射线 / FFT / Playwright helpers
+│   ├── extract.py            # ffmpeg 抽帧（7 子命令）
+│   ├── verify.py             # Playwright 渲染验证（10 子命令）
+│   ├── analyze.py            # 帧分析（14 子命令）
+│   └── search.py             # bili 检索（1 子命令）
 ├── 进度与待办.md              # 完整技术档案
 └── (已 .gitignore) frames_*/ ref_video/ node_modules/ verify_*/ 等
 ```
@@ -156,23 +161,25 @@ npm start
 
 ## 复现分析结论
 
-所有量化结论都可复跑（前提：先安装 Python + numpy + Pillow + opencv-python + playwright）：
+所有量化结论都可复跑（前提：先安装 Python + numpy + Pillow + imageio_ffmpeg + playwright）：
 
 ```bash
 # 1. 抽帧 BV1CkcbzgEkC（iris_pulse 实机录像）
-python extract_hifps2.py
+python tools/extract.py hifps2
 
 # 2. 量化尖刺旋转（残差 4 次谐波相位 + 连续解卷绕）
-python corner_angles.py
-python corner_angles2.py
+python tools/analyze.py corner-angles
 
-# 3. 量化白盘 0.86s 呼吸
-python disc_pulse_analysis.py
+# 3. 量化白盘 0.86s 呼吸（多方位 FFT）
+python tools/analyze.py disc-pulse
 
 # 4. Playwright 验证桌宠实机
-python verify_white_disc2_minmax.py   # 强制 min vs max 对照
-python verify_white_disc_live.py      # 全程动画 5 帧对照
+python tools/verify.py white-disc --mode live        # 全程动画 5 帧
+python tools/verify.py white-disc --mode minmax      # CSS 强制 min/max
+python tools/verify.py white-disc                    # 8 相位（默认）
 ```
+
+`python -m tools.<module> <subcmd>` 也可（同样效果）；详细子命令清单见 `tools/extract.py --help` 等。
 
 ---
 
