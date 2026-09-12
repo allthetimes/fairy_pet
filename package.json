@@ -1,0 +1,15 @@
+{
+  "name": "fairy-pet",
+  "version": "1.0.0",
+  "description": "Fairy desktop pet — Zenless Zone Zero. Transparent always-on-top overlay window.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": ["desktop-pet", "electron", "zzz"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^44.3.0"
+  }
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="E55IdQ3cwdzrMw1TFSSgdk">
+<head data-page-node-id="nfVZjxd1QNG2Twyi3exzF3">
+<meta charset="UTF-8" data-page-node-id="BeMbnhLcm8ekbdDgFvmjUs" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" data-page-node-id="jE9Uh3hJJ3NCZQzXny96xR" />
+<title>Fairy</title>
+<link rel="stylesheet" href="style.css" data-page-node-id="gWeKiIEkHZi3mSvFXngP0N" />
+</head>
+<body data-page-node-id="nA6oABXYMSLYqrAcqJOVHo">
+
+<div id="stage" data-page-node-id="Ab6pV3RIuFUgUcqtWHDLLB">
+
+  <!-- 对话气泡 -->
+  <div id="bubble" class="hidden" aria-live="polite" data-page-node-id="Zin7MeFvCe1FPe10OOQpsQ">
+    <div id="bubble-inner" data-page-node-id="syeNc4VtF9A1j3u0nrj5mp">
+      <span id="bubble-text" data-page-node-id="dSBUwEUbs1edQpDajIxbm3"></span>
+    </div>
+    <div id="bubble-tail" data-page-node-id="41km3IGkzWSOb8IhfrcHPZ"></div>
+  </div>
+
+  <!-- Fairy 本体 -->
+  <div id="boot" data-page-node-id="L2g4hXIZ3jqun4MPHQrqk7">
+    <div id="fairy-hit" data-page-node-id="RqewioJEsKkDFB2p4QK9SL">
+      <div id="halo" data-page-node-id="1CXNtQCBbGzv6qrXOdSF8h"></div>
+
+      <svg id="fairy-svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" data-page-node-id="236Ol3f6SFQKtIhM22GRvR">
+        <defs data-page-node-id="OWV5aC5dOyyfhNOHfr0uOA">
+          <!-- 底层暗蓝（贴近白盘处略亮，还原原作的层次） -->
+          <radialGradient id="gDark" cx="50%" cy="50%" r="50%" data-page-node-id="OA8JyFq7GJ5xRuR6gy0ifZ">
+            <stop offset="0%"   stop-color="#1B2178" data-page-node-id="alvFslz31LtOgKYotiB2Ck" />
+            <stop offset="58%"  stop-color="#415196" data-page-node-id="7dDHWSw5AVuMOpTK8uyZue" />
+            <stop offset="71%"  stop-color="#2A3087" data-page-node-id="wFhMwakzTo0YxuyySY6ekP" />
+            <stop offset="80%"  stop-color="#21298F" data-page-node-id="AdlKaNmL1lfN0AYNPN0hrF" />
+            <stop offset="100%" stop-color="#262E9B" data-page-node-id="3b9gmFtOGIc0ksIFZfanjz" />
+          </radialGradient>
+
+          <!-- 亮蓝外环（userSpaceOnUse，便于随呼吸动画改变环宽） -->
+          <radialGradient id="gBright" gradientUnits="userSpaceOnUse" cx="120" cy="120" r="100" data-page-node-id="0RG64GjZ5KEsHmpwMuTMx8">
+            <stop offset="80%"   stop-color="#2E3CDE" data-page-node-id="Z4CqvNZoXqTc5LnWcl4Vxa" />
+            <stop offset="87%"   stop-color="#2D3FE8" data-page-node-id="ybMvV9aD1ql9JDz7jBy0Zf" />
+            <stop offset="95%"   stop-color="#2E42EA" data-page-node-id="Lbebe7FKegi36PEWuP0s3B" />
+            <stop offset="100%"  stop-color="#4A66FF" data-page-node-id="OF9qjDjpKrBQxTuKNu7msj" />
+          </radialGradient>
+
+          <!-- 白色盘 -->
+          <radialGradient id="gWhite" cx="43%" cy="38%" r="70%" data-page-node-id="CABLpBW2ZYHY4zDb05bDYY">
+            <stop offset="0%"   stop-color="#F7F5FA" data-page-node-id="wn1oJHWj0PCSUS8rjzTvDM" />
+            <stop offset="62%"  stop-color="#DAD6E1" data-page-node-id="JLvJCoSwKlQLTHXEx8OQF6" />
+            <stop offset="100%" stop-color="#B4AFC1" data-page-node-id="ivIDcPEfRN7seE6qrF4bqM" />
+          </radialGradient>
+
+          <!-- 核心：深蓝 -->
+          <radialGradient id="gCore" cx="46%" cy="44%" r="62%" data-page-node-id="rxzhbnSIReIJmUt1tlXsPi">
+            <stop offset="0%"   stop-color="#22376A" data-page-node-id="TUz7pGcecijTRhynGdYoLJ" />
+            <stop offset="68%"  stop-color="#28437C" data-page-node-id="RrfzhF9i2AOlWFuiEaKFAv" />
+            <stop offset="100%" stop-color="#2E4E8E" data-page-node-id="7xPZ2nleDlKntfilHEaCcO" />
+          </radialGradient>
+
+          <!-- 瞳孔高光球（边缘柔化） -->
+          <radialGradient id="gGlint" cx="42%" cy="38%" r="68%" data-page-node-id="DSL3oRBl2Lo9BZvSwKGyky">
+            <stop offset="0%"   stop-color="#FFFFFF" stop-opacity="1" data-page-node-id="HHfZeH1yvSEykIGSlLSzSW" />
+            <stop offset="58%"  stop-color="#FFFFFF" stop-opacity=".97" data-page-node-id="n1Vw5nwyieBRaAoGIs2d5k" />
+            <stop offset="86%"  stop-color="#EFEDF7" stop-opacity=".86" data-page-node-id="MvPl7uM2CrNgWkP8VwVemw" />
+            <stop offset="100%" stop-color="#D9D6E6" stop-opacity=".55" data-page-node-id="59b9cuuk4CrmL9GNitPOJb" />
+          </radialGradient>
+
+          <clipPath id="clipOuter" data-page-node-id="SpnFIFbwRIJNZSSreSxbuH"><circle cx="120" cy="120" r="104" data-page-node-id="f6hpk74zQYCA9lQcKSG2yi" /></clipPath>
+
+          <!-- 只保留 r>79.5 的部分：让尖刺表现为「暗蓝环带外缘向外鼓起」，
+               而不是压在环带内部形成一道深色箭头（对齐实机观感） -->
+          <mask id="maskSpikeOnly" maskUnits="userSpaceOnUse" x="0" y="0" width="240" height="240">
+            <rect x="0" y="0" width="240" height="240" fill="#fff" />
+            <circle cx="120" cy="120" r="79.5" fill="#000" />
+          </mask>
+        </defs>
+
+        <!-- 1. 底层暗蓝盘 -->
+        <circle cx="120" cy="120" r="100" fill="url(#gDark)" data-page-node-id="jvSHkqzFMlgtBGAZDNuZEB" />
+
+        <!-- 2. 亮蓝外环：内缘固定 r=80，外缘随呼吸 100→102.6（实机外径 ±2.6%） -->
+        <circle id="brightRing" cx="120" cy="120" r="90" fill="none"
+                stroke="url(#gBright)" stroke-width="20" data-page-node-id="LF1g9QAqB6eEHimlTCCkm5" />
+
+        <!-- 3. 四个尖刺：暗蓝楔形自暗蓝环带【朝外】扎进亮蓝外环
+             实测 BV1CkcbzgEkC 右眼：4 个尖刺保持 90° 对称、整体绕中心**匀速顺时针旋转**，
+             45°/s（一周 8.0s）；尖端达外圈半径的 ~0.96，基部在环带外缘处约 15° 宽。 -->
+        <g id="corners" clip-path="url(#clipOuter)" mask="url(#maskSpikeOnly)" fill="#232A8F">
+          <path d="M120,24 L109,41 L131,41 Z" />
+          <path d="M120,24 L109,41 L131,41 Z" transform="rotate(90 120 120)" />
+          <path d="M120,24 L109,41 L131,41 Z" transform="rotate(180 120 120)" />
+          <path d="M120,24 L109,41 L131,41 Z" transform="rotate(270 120 120)" />
+        </g>
+
+        <!-- 4. 白色盘：随呼吸节奏同步脉动（实测 BV1CkcbzgEkC 0°/45° 方位白盘外缘
+             std≈3-5px/中位 105px ≈ ±3-5% 半径，FFT 主峰 0.86-0.88s，与虹膜完全同频）。
+             用 transform:scale 呼吸，gWhite 默认 objectBoundingBox 会随圆一起缩放，
+             高光偏移位置（左上）保持相对不变。 -->
+        <circle id="whiteDisc" cx="120" cy="120" r="65" fill="url(#gWhite)" data-page-node-id="5DQLW2ai6mNBmAq8Yf1r4w" />
+
+        <!-- 5. 外圈细白描边 -->
+        <circle cx="120" cy="120" r="99" fill="none"
+                stroke="rgba(255,255,255,0.5)" stroke-width="1.6" data-page-node-id="Dlv8iaGrfusoe6wGPYc9Ng" />
+
+        <!-- 6. 亮蓝环辉光：呼吸峰值时轻微增亮（实机环亮度 +1.5%） -->
+        <g clip-path="url(#clipOuter)" data-page-node-id="SL8VB52CEHFrcIQVRXYaSL">
+          <circle id="ringGlow" cx="120" cy="120" r="90" fill="none"
+                  stroke="#8AA6FF" stroke-width="22" opacity="0" data-page-node-id="yXmOwPaNXHEpy9aAtZ4EHQ" />
+        </g>
+
+        <!-- 7. 虹膜：#gaze 视线跟随；#irisPulse 让眼睛里的圆做 0.5s 缩放呼吸；#iris 可眨眼 squash -->
+        <g id="gaze">
+          <g id="irisPulse">
+            <g id="iris">
+              <circle cx="120" cy="120" r="37.5" fill="none" stroke="#808CC5" stroke-width="13" />
+              <circle cx="120" cy="120" r="24.5" fill="none" stroke="#3164C0" stroke-width="11" />
+              <circle cx="120" cy="120" r="19" fill="url(#gCore)" />
+              <circle cx="137" cy="146.5" r="12.5" fill="url(#gGlint)" />
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

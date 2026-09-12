@@ -1,0 +1,243 @@
+/* ============================================================
+   Fairy desktop pet — 样式
+   动画：
+   - 0.5s 同步脉冲：圆描边变粗再变细（stroke-width 脉动）+ 核心缩放
+   - 眨眼：长间隔随机（25-55s），纵向 squash，仅持续 ~110ms
+   - 视线跟随：鼠标进入窗口附近时启动，最大位移 5px，平滑插值
+   - 去除上下浮动、外环旋转扫描（实机没有、且过于喧闹）
+   ============================================================ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", system-ui, sans-serif;
+}
+
+#stage { position: absolute; inset: 0; }
+
+/* ---------------- 角色 ---------------- */
+
+#boot {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  width: 240px;
+  height: 240px;
+  margin-left: -120px;
+  animation: boot 900ms cubic-bezier(.2, .9, .3, 1.35) both;
+}
+
+@keyframes boot {
+  from { opacity: 0; transform: scale(.35) translateY(22px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+#fairy-hit {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: scale(var(--s, 1));
+  transform-origin: center bottom;
+  cursor: grab;
+}
+
+#fairy-hit.grabbing { cursor: grabbing; }
+
+#fairy-hit.asleep { filter: saturate(.55) brightness(.82); }
+#fairy-hit.asleep #brightRing,
+#fairy-hit.asleep #irisPulse,
+#fairy-hit.asleep #corners,
+#fairy-hit.asleep #ringGlow,
+#fairy-hit.asleep #halo,
+#fairy-hit.asleep #whiteDisc { animation-play-state: paused; }
+
+/* ---------------- Fairy 视觉 ----------------
+   0.86s 同步呼吸节奏（基于 BV1CkcbzgEkC 实测，FFT 主峰 0.83-0.88s）：
+     - 内部圆（#irisPulse） scale 1↔1.12
+     - 亮蓝外环（#brightRing） r 90↔91.5, sw 20↔22
+     - 外发光（#halo）          scale 1↔1.05, opacity 0.75↔0.95
+     - 环辉光（#ringGlow）      opacity 0.05↔0.40
+     - 白盘（#whiteDisc）        scale 1↔1.04
+   全部 0.86s ease-in-out infinite，整个眼睛像在同步呼吸
+
+   另有一条独立的旋转节奏（实测 8.0s）：
+     - 四个尖刺（#corners）作为整体绕中心匀速旋转（见下） */
+
+#fairy-svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 9px rgba(64, 94, 255, .9))
+          drop-shadow(0 0 26px rgba(45, 63, 232, .55));
+  transition: filter 260ms ease;
+}
+
+#fairy-hit:hover #fairy-svg {
+  filter: drop-shadow(0 0 13px rgba(120, 152, 255, 1))
+          drop-shadow(0 0 40px rgba(70, 100, 255, .75));
+}
+
+/* 亮蓝外环：内缘固定 80，外缘 100 → 103（轻微外扩） */
+#brightRing {
+  animation: ringBreathe 0.86s ease-in-out infinite;
+}
+@keyframes ringBreathe {
+  0%, 100% { r: 90px;   stroke-width: 20px; }
+  50%      { r: 91.5px; stroke-width: 22px; }
+}
+
+/* 白盘：与虹膜同频呼吸（±4% 半径，对齐 BV1CkcbzgEkC 实测 ±3-5%）。用 transform-box:fill-box
+   让 transform-origin 相对自身边界框，便于后续若改 r 仍能围绕几何中心。 */
+#whiteDisc {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: whiteDiscPulse 0.86s ease-in-out infinite;
+}
+@keyframes whiteDiscPulse {
+  0%, 100% { transform: scale(1);    }
+  50%      { transform: scale(1.04); }
+}
+
+/* 环辉光：与外环同步鼓亮 */
+#ringGlow {
+  mix-blend-mode: screen;
+  filter: blur(5px);
+  animation: glowPulse 0.86s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.05; }
+  50%      { opacity: 0.40; }
+}
+
+/* ---------------- 虹膜：视线跟随 + 眨眼 + 内部圆缩放 ----------------
+   依据 BV1CkcbzgEkC 0-15s 右眼（2.6 版立绘）30fps 精确测量：
+     内部圆面积脉动 ±13.3%（等效半径 ±6.4%），实测基频 ~0.86s */
+
+#gaze {
+  transform-origin: 120px 120px;
+  transition: transform 180ms cubic-bezier(.25, .8, .35, 1);
+}
+
+/* 内部圆整体缩放呼吸 */
+#irisPulse {
+  transform-origin: 120px 120px;
+  animation: irisScale 0.86s ease-in-out infinite;
+}
+
+@keyframes irisScale {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.12); }
+}
+
+#iris {
+  transform-origin: 120px 120px;
+  transition: transform 70ms ease-in-out;
+}
+#iris.blinking { transform: scaleY(.07); }
+
+/* 四个尖刺：朝外扎进亮蓝外环，作为整体绕中心**匀速顺时针旋转**
+   实测（残差 4 次谐波相位，12s 内连续推进 6 圈）：角速度 45°/s → 周期 8.0s。
+   注：正因为 4 个等距，任何固定角度上「尖刺经过」的周期 = 90°/45° = 2.0s。 */
+#corners {
+  transform-origin: 120px 120px;
+  animation: cornersSpin 8s linear infinite;
+}
+
+@keyframes cornersSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 圆形外发光：与呼吸同步 */
+#halo {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%,
+              rgba(74, 106, 255, .30) 0%,
+              rgba(45, 63, 232, .20) 44%,
+              rgba(45, 63, 232, .07) 62%,
+              rgba(45, 63, 232, 0) 74%);
+  animation: pulse 0.86s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: .75; transform: scale(1); }
+  50%      { opacity: .95; transform: scale(1.05); }
+}
+
+/* 点击回弹（作用在容器上，避免与 #fairy-svg 的呼吸 transform 冲突） */
+#fairy-hit.bounce { animation: bounce 420ms cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes bounce {
+  0%   { transform: scale(var(--s, 1)); }
+  38%  { transform: scale(calc(var(--s, 1) * 1.09)); }
+  100% { transform: scale(var(--s, 1)); }
+}
+
+/* ---------------- 气泡 ---------------- */
+
+#bubble {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 6px;
+  z-index: 10;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms ease, transform 220ms cubic-bezier(.2, .9, .3, 1.3);
+}
+
+#bubble.hidden {
+  opacity: 0;
+  transform: translateY(10px) scale(.96);
+  pointer-events: none;
+}
+
+#bubble-inner {
+  position: relative;
+  max-height: 104px;
+  overflow: hidden;
+  padding: 10px 13px;
+  border-radius: 13px;
+  background: linear-gradient(160deg, rgba(22, 30, 68, .93), rgba(12, 17, 42, .95));
+  border: 1px solid rgba(96, 132, 255, .55);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .42),
+              0 0 16px rgba(58, 92, 255, .32) inset,
+              0 0 22px rgba(58, 92, 255, .26);
+  backdrop-filter: blur(8px);
+}
+
+#bubble-text {
+  display: block;
+  color: #DDE6FF;
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: .2px;
+  text-shadow: 0 0 10px rgba(110, 150, 255, .45);
+}
+
+#bubble-tail {
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 13px;
+  height: 13px;
+  margin-left: -6.5px;
+  background: rgba(14, 19, 46, .95);
+  border-right: 1px solid rgba(96, 132, 255, .55);
+  border-bottom: 1px solid rgba(96, 132, 255, .55);
+  transform: rotate(45deg);
+}

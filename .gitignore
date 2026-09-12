@@ -1,0 +1,56 @@
+# ============================================================
+# Fairy 桌宠 — git ignore
+# ============================================================
+
+# 运行时
+node_modules/
+
+# 源视频（版权归米哈游）
+ref_video/
+
+# 抽出的帧（巨大、可由脚本复现）
+frames_egg/
+frames_full/
+frames_hifps/
+frames_hifps2/
+frames_iris_pulse/
+frames_voice/
+frames_evt_event_*/
+full_frames/
+eye_crops/
+right_eye_seq/
+
+# 早期实验/中间产物（compare_corners_spin 保留，里面是关键证据）
+compare/
+compare_events/
+compare_iris/
+compare_iris_scale/
+compare_pulse05/
+compare_ripple/
+compare_corners_pop/
+compare_full_breathe/
+
+# Playwright 验证产物（可复现、不入库；关键证据图已拷到 docs/process/）
+verify_shots/
+verify_white_disc/
+verify_white_disc2/
+verify_white_disc_live/
+fairy-boot-snapshot.png
+fairy-startup.log
+
+# 二进制中间缓存（python pickle/numpy npy）
+*.pkl
+*.npy
+
+# 临时 / 系统
+*.tmp
+*.bak
+*.log
+*~
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 注意保留
+# docs/、docs/process/、assets/*、renderer/*、*.py 全部入库
