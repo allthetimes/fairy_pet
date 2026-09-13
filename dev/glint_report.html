@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="rhyZWguvnADLrSY9dOaHXy">
+<head data-page-node-id="mmKhtDOAKoXWW4kzD5ZAc6">
+<meta charset="utf-8" data-page-node-id="XR4dqNXTiLgvxjxfI1A3Ui">
+<title>高光球行为分析 · Fairy 环形核</title>
+<style>
+  :root{--ink:#1b2030;--sub:#5c657a;--line:#e2e6ef;--bg:#f7f8fb;--ok:#0f7a3d;--warn:#b45309;--acc:#2b4fd8}
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 40px 60px;background:#fff;color:var(--ink);
+       font:14px/1.65 -apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+  h1{font-size:21px;margin:0 0 6px}
+  h2{font-size:15px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .meta{color:var(--sub);font-size:12.5px;margin:0 0 20px;line-height:1.9}
+  code{background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px}
+  table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+  th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  thead th{background:var(--bg);color:var(--sub);font-weight:600;font-size:12px;
+           border-bottom:1px solid #d5dae6;white-space:nowrap}
+  .ok{color:var(--ok);font-weight:600}
+  .bad{color:var(--warn)}
+  .dim{color:var(--sub)}
+  .wrap{overflow-x:auto}
+  .note{background:var(--bg);border-left:3px solid var(--acc);padding:10px 14px;font-size:13px;
+        color:#39415a;border-radius:0 6px 6px 0;margin:14px 0 0}
+  figure{margin:14px 0 0}
+  figure img{width:100%;border:0.5px solid var(--line);border-radius:8px;display:block;max-width:760px}
+  figcaption{font-size:12px;color:var(--sub);margin-top:6px;line-height:1.6}
+  .verdict{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+  .vcard{flex:1 1 300px;min-width:260px;background:var(--bg);border-radius:8px;padding:12px 14px;font-size:13px}
+  .vcard b{display:block;font-size:13px;margin-bottom:6px}
+</style>
+</head>
+<body data-page-node-id="JmDZqbEcfQzTmwC8SbeEtq">
+
+<h1 data-page-node-id="7rqALOZxAZkqCHInHSC6PJ">高光球行为分析：变大变小、贴着深眼、偶尔分离</h1>
+<p class="meta" data-page-node-id="QNboIa4bbDyI7lqH4YF8IA">
+测量素材 <code data-page-node-id="jHy3zJDaG4YSA4MhUESiB2">dev/20260913-130732.mp4</code>（60fps，边缘锐利，12s / 720 帧）<br data-page-node-id="yblFytc0E14ThqJ6rV1n6u">
+方法：以已知基准位置（相对圆心方位 53.8°、距离 0.31R）开半径 45px 的固定窗口，
+      窗口内取"最亮 − 4"的紧阈值分割出球的最亮核心（此阈值刚好把白环挡在窗外），
+      逐帧测质心、等效半径、核心像素的半径分位；深眼边缘在避开高光的三个方向用梯度法测。
+</p>
+
+<h2 data-page-node-id="rUq6fftmXrybMk5jdNG2fT">结论：你的观察全部成立</h2>
+<div class="verdict" data-page-node-id="Q2ugWDnuCVEIBPya8QGN4d">
+  <div class="vcard" data-page-node-id="geldidFhfhDXdLTe8P7NWf">
+    <b class="ok" data-page-node-id="ydf1lr9i1kUdPnTGDbJ4uc">① 会变大变小 ✅</b>
+    球核心半径 23.4px，随呼吸 <b data-page-node-id="d7lnxO0XzUG38i6TDVDBQX">±8.5%</b>（振幅 1.99px，信噪比 2.0）<br data-page-node-id="8tlXQUbLE2FMxiSieGgawv">
+    <span class="dim" data-page-node-id="UsSgxzswwweQCdFKeUpAAF">之前的 <code data-page-node-id="49h1XZt3nQK6HQ3E7bvY3L">glint_track.json</code> 说"±1%、零相关"，那是用 cv2 连通域
+    按 max−10 取全轮廓，把渐变边缘一起算进去，把变化平均掉了</span>
+  </div>
+  <div class="vcard" data-page-node-id="MB1Kbq3UP11ToKsbsBJOlv">
+    <b class="ok" data-page-node-id="xZZRtlDVuhPPbp96BWOS6V">② 位置也跟着动 ✅</b>
+    球心距 75.6px，随呼吸 <b data-page-node-id="4uSUOZtvN5rtDaNNPwDULk">±6.5%</b>（振幅 4.88px，信噪比 3.3）
+  </div>
+  <div class="vcard" data-page-node-id="kLWX83lyC5Ksuhygd3IuWn">
+    <b class="ok" data-page-node-id="b2MhJUFXmIpS2XTInVmWCZ">③ 贴着深眼 ✅</b>
+    核心内缘几乎始终压在深眼边缘上 —— 球的一部分越过深眼边界，不是"相切"而是<b data-page-node-id="hHG5vFHCUOZqFdKWEFnwra">压过去</b>
+    （核对图上红圈穿进球体）
+  </div>
+  <div class="vcard" data-page-node-id="vjatBiOcrrQngzsg37GYys">
+    <b class="bad" data-page-node-id="BrV70qYnRtU0IDsPrT32jz">④ 偶尔分离 ✅</b>
+    720 帧里有 <b data-page-node-id="NvNpiN2pBTHnQJIrsht1dL">13 帧（1.8%）</b>球核心内缘退到深眼边缘外侧 —— 就是你说的"有几帧会分离"
+  </div>
+</div>
+
+<h2 data-page-node-id="fxvzxW7NZWufjErovYlAto">1. 逐帧序列统计（旧素材，12s / 720 帧）</h2>
+<div class="wrap" data-page-node-id="iu0znYGaC4sBW7hlURuCwH">
+<table data-page-node-id="P8xKZXKYrxRMQ9ZBw1xOGf">
+  <thead data-page-node-id="pI4U0O5BNGsEtSu8zfb0ds"><tr data-page-node-id="cdMe7zWreUotaYnzKCuODZ"><th data-page-node-id="kB5lryAWqYUwMBv0APDA19">量</th><th data-page-node-id="RMNJEpDRl61nL5HFGp4dmC">均值</th><th data-page-node-id="LUl37y9VGYKueE3tY3iaPl">标准差</th><th data-page-node-id="3HyWRV7P0jMEctQrOx0aDl">范围</th><th data-page-node-id="TvapXBAsE1sQYPv96JWpIw">峰谷</th></tr></thead>
+  <tbody data-page-node-id="bdDqgO7ibX4XkDfPAhS7oX">
+    <tr data-page-node-id="L0FPMUudwPqYqVSNSLqNxz"><td data-page-node-id="Ih2rWK42QMB8QBE85jLdKf">球核心半径</td><td data-page-node-id="DBCEuB3U1IzCNUG63spRaz">23.44 px</td><td data-page-node-id="eXSCSvU8ycNIBLKPNq3B2R">1.72</td><td data-page-node-id="spfdFwsNA9SeYzgg5EUTRg">15.17 ~ 27.30</td><td data-page-node-id="cdzxld84XqCpLY4oTAqH1E">51.8%</td></tr>
+    <tr data-page-node-id="Kt9UvFeOiL4VsMqDO8GE8E"><td data-page-node-id="e5a4QIRJsGHHWrcFwqQTfl">球心距（到圆心）</td><td data-page-node-id="2sZ5xNSCat94ZWL5RpybbW">75.61 px</td><td data-page-node-id="Yq8ErH6Q5ayBybxT48eQkH">3.74</td><td data-page-node-id="Y1axZn5vXD2bKJNfBYX2c5">58.83 ~ 81.47</td><td data-page-node-id="FHdQpQlqNkIkH44vq3srwR">30.0%</td></tr>
+    <tr data-page-node-id="ZUYpTXYHxuNfpHjZetqzBh"><td data-page-node-id="7x6xLkY3QGejmBHmelnsri">球核心内缘 P5</td><td data-page-node-id="aV8lV52tFzWmQeKWqpAI4R">55.84 px</td><td data-page-node-id="JAoC6aeQGNy0ezS7tugZZA">2.90</td><td data-page-node-id="ok9kzTliGkneGGasKbNHHI">41.73 ~ 62.37</td><td data-page-node-id="0yajmDH7zKbDcTMPeBaZYH">37.0%</td></tr>
+    <tr data-page-node-id="gYRgCOjLwKT79hfC5JhVYg"><td data-page-node-id="39lFNKec7BHblv6BR3hQ1A">球核心外缘 P95</td><td data-page-node-id="fQAtZc13xTQAvt7Nco3pqd">96.74 px</td><td data-page-node-id="wicQoGEjIj40aobFafDM7y">4.95</td><td data-page-node-id="RIIIwGBoKAmRkbYiwQDJcF">77.93 ~ 104.23</td><td data-page-node-id="HrDD2PeeyhB7dikp3PFw6S">27.2%</td></tr>
+    <tr data-page-node-id="ydQ0LaxrDXgxvYP6eKNDQM"><td data-page-node-id="0dcxOwal8CeZcx91k63U8I">深眼边缘半径</td><td data-page-node-id="8EaQOmsABRN1JldAoMHEif">59.60 px</td><td data-page-node-id="24OAnFYMz8GhN6pIUdl9Oi">6.33</td><td data-page-node-id="eZzzXf9n34a6sUYzkBU13g">11.59 ~ 68.09</td><td data-page-node-id="rDMIWe6rP1GKZF0rITUa65">94.8%</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 data-page-node-id="N5fI9Xf6gn0xsAkAjZZ2js">2. 呼吸频率处的拟合（判据是否真有信号）</h2>
+<div class="wrap" data-page-node-id="iBwbOB61LdYCX5J5M2xBC3">
+<table data-page-node-id="rheHE43HFe2y1BRjGhHC3o">
+  <thead data-page-node-id="r2hjYASCjORJm9K67AvV52"><tr data-page-node-id="PyNX4OCpEWDdGj6LqxMIex"><th data-page-node-id="wosQXX5CFDjEzVKc5Up1BS">量</th><th data-page-node-id="ZMAZ6ZBkZW5cUnuVBO5xy1">频率</th><th data-page-node-id="ypn3U5sZwcSMt6lFx7zQPS">振幅</th><th data-page-node-id="W40f0ECrWDEiV1U5ggqw0R">相对幅度</th><th data-page-node-id="IblSRfNyVvYhMs6MDdI3KA">相位</th><th data-page-node-id="jPYVezk57HG0PpDVQFE1cC">残差</th><th data-page-node-id="J3AxAkPEMePF1IDF8wPZfe">信噪比</th></tr></thead>
+  <tbody data-page-node-id="ULpN9uycwugR6XkEYnshQo">
+    <tr data-page-node-id="PT8Q057zRxDbgY0X9tQPAK"><td data-page-node-id="YAak7zoYZoFAVnj3NtxBuc">球心距</td><td data-page-node-id="yYBBqbgFsEsZYvIWMR4GSL">1.1628 Hz</td><td data-page-node-id="DKPi9Gguef3iVTk4gFdmXx">4.876 px</td><td data-page-node-id="KlAV5OTrNtPSzcXPt2hrl9"><b data-page-node-id="ZY6MvUnohl8YvqfECkwnbQ">6.45%</b></td><td data-page-node-id="G2BE0n3cHpPSXlLnMCH6fs">20.3°</td><td data-page-node-id="YuLqH19ShoUe7GvCDOwtfA">1.460</td><td class="ok" data-page-node-id="dhXDxJyBKkMTb2lVqlZW1o">3.34</td></tr>
+    <tr data-page-node-id="EnrwbhJh2rJ5qLODFIkFkn"><td data-page-node-id="YzqStom6GNoxvJYmQbYNDW">球核心半径</td><td data-page-node-id="UrGmSGMk4Mk4rYrVPGxx3M">1.1662 Hz</td><td data-page-node-id="iqncNs3HGjv8Q3QVEGofHM">1.987 px</td><td data-page-node-id="Vq3LpNgT7CL5D8cCWOAMyy"><b data-page-node-id="PauLPDLTLrDsdrL2IP1IZN">8.48%</b></td><td data-page-node-id="P5lPhEGhBXLViyRSTZcDJE">26.1°</td><td data-page-node-id="N2LJCRDqLJc8bX0tZpYqw9">0.992</td><td class="ok" data-page-node-id="MZKq9H4LXDsLmmv9OBRKxM">2.00</td></tr>
+    <tr data-page-node-id="Gr3eFSx3XdzPiY4EwLlwlF"><td data-page-node-id="fokXUi5xqce3aRfUGBsXAe">球核心内缘</td><td data-page-node-id="gAid7TdAXaYqqPdGLJGxrE">1.1608 Hz</td><td data-page-node-id="M7AVpAnhZwB5hc0GzhJkCY">3.603 px</td><td data-page-node-id="79pDVYEdlArewHFQFflg0J">6.45%</td><td data-page-node-id="gECl6MSFpVi5y4KRAWlJ0s">14.7°</td><td data-page-node-id="yKmhW1Z6d95FNXJ5QOBb2e">1.390</td><td class="ok" data-page-node-id="L1yz5B0XdJTrHuwUocTAnL">2.59</td></tr>
+    <tr data-page-node-id="qSWBX2JWlV2GQWZdIAGCK2"><td data-page-node-id="iT9NL3t8WaL9oCtj3qlkCq">深眼边缘</td><td data-page-node-id="V4iwMFEyg5OZqa4T8oFsyd">1.1536 Hz</td><td data-page-node-id="PAEJ6VU1lhdMGygWgKcpwS">4.356 px</td><td data-page-node-id="PVY1wod1ToCEQjAUwDNsXj">7.31%</td><td data-page-node-id="mgALpGctGPpu9C6sS33LBa">21.8°</td><td data-page-node-id="W3pSiKO4oYv7lhYdlOesXp">5.527</td><td class="dim" data-page-node-id="dNuHyAMJFVsswcl5Hawc5I">0.79</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note" data-page-node-id="XHwATHdqstFqjCXvDuL6sJ">
+  <b data-page-node-id="IN58YnDBW2si9RB1BtyntN">关键</b>：四个量的相位全部落在 14.7°–26.1° 区间（差 &lt; 10°，即 &lt; 7ms），
+  而且球的相对振幅（8.48%）与深眼的（7.31%）几乎一样。
+  <br data-page-node-id="V0RBhEYZoUJtghI6K66Z7L">→ <b data-page-node-id="v15C61VSC5z7F6E6bx84nT">球与深眼是同步缩放的</b>：深眼鼓起时球也鼓、同时球心外移，所以内缘始终贴着深眼边缘。
+  这是"贴着"能一直维持的原因 —— 不是两个独立动画凑巧对上。
+</p>
+
+<h2 data-page-node-id="5E74hVSsjHBgSW2xpsJKKF">3. 核对图：球确实压过深眼边缘</h2>
+<figure data-page-node-id="BqcG9g19F4MyiCgVH7sZwq">
+  <img src="glint_mask_check.png" alt="高光掩膜核对" data-page-node-id="j7G7PlczZLK4Gp3XZ9OK3k">
+  <figcaption data-page-node-id="zty1xAXXxBshZSh75psASU">红 = 球的最亮核心（紧阈值分割结果）；黄圈 = 球心基准位置（0.31R）；绿圈 = 深眼边缘。
+    球体明显越过了深眼边界，核心内缘落在深眼边缘内侧。</figcaption>
+</figure>
+
+<h2 data-page-node-id="uizx8KLbvQ7bXXZEFRDZuv">4. 关于"分离"的帧</h2>
+<p class="meta" data-page-node-id="9fBAUzZgBNNdDEiYAxxJWV">
+判断标准：球核心内缘 P5 的半径 &gt; 深眼边缘半径，即球的亮区完全退到深眼之外。
+</p>
+<div class="wrap" data-page-node-id="Oaq7COlEoNaJEw7FoMMLJN">
+<table data-page-node-id="iwlVnzIagSHTqFS2YxE2VE">
+  <thead data-page-node-id="UiXYGcrHdYf6DWP9FGuGEF"><tr data-page-node-id="EVswOZcBDUderPJKc7UI3W"><th data-page-node-id="3fz7fCE3B79rU72TAWXb07">指标</th><th data-page-node-id="4OnZoeTDtpx20HMM3TADqh">数值</th></tr></thead>
+  <tbody data-page-node-id="MbwbPDNkE3uUnp1Dgbui3s">
+    <tr data-page-node-id="KKrQQRaC4lkgVGmBiK3vuV"><td data-page-node-id="tBZx0YAu4XyM2qxi3Ro5ws">球内缘压在深眼内侧的帧</td><td data-page-node-id="dyUpJnWEqlbvKGHoUW0Dn8">707 / 720（98.2%）</td></tr>
+    <tr data-page-node-id="Hcopk1xhk7oDwWFmB5Pznd"><td data-page-node-id="NLJIKZxZ8ndrkgCX4Ascap">球内缘退到深眼外侧（分离）的帧</td><td class="bad" data-page-node-id="bLPnKEpkvePPlFuUpXUCrL">13 / 720（1.8%）</td></tr>
+    <tr data-page-node-id="8fx1UR6Oe3DasHnsqfzpM3"><td data-page-node-id="BsgiKEBx0nQJFUIgJ389Y1">平均压入深度</td><td data-page-node-id="hjrqU8ebW3LKabQfEZW4v7">3.76 px</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note" data-page-node-id="4ivZ10Qq7EsDiXjq1s9Yyh">
+  分离的帧很短、不成片，符合"深眼收缩到最小相位时球核心短暂退到边界外"的解释：
+  球心距也在同步外移（±4.9px），当两者相位有十几毫秒偏差时，收缩末端就会出现 1–2 帧的分离。
+</p>
+
+<h2 data-page-node-id="bUNw8HzQIwq66MzBwhUej0">对 lab 实现的建议</h2>
+<p class="meta" data-page-node-id="ganRolaZmEYMhademDT0sH">
+现在 <code data-page-node-id="X41PzGGYi4GtgFEeQvxucg">fairy-lab.html</code> 里高光是<b data-page-node-id="vgky7lLYQtNWXeb4jZD76s">固定半径 14.1u、不参与呼吸</b>，只有位置跟着深眼联动
+（<code data-page-node-id="uXxDAF2LtOZSngZVyjpxoV">d = rp + 14.4</code>）。实测是球会随呼吸缩放 ±8.5%，所以：
+</p>
+<div class="wrap" data-page-node-id="08t0WeMrDN762ClAFjrq28">
+<table data-page-node-id="9FKA3gXmZmIRLAEkXKLhMH">
+  <thead data-page-node-id="LeujAVMNsut9gtym9C72NB"><tr data-page-node-id="LgOrnXTbS3LB6zBO8rNQyf"><th data-page-node-id="G11P3YLd2z5PyP3VuUQpJm">项</th><th data-page-node-id="BMmsOw1KFTa03oldriqFnA">当前实现</th><th data-page-node-id="av3byRbR906RjulOlTsnWe">实测</th><th data-page-node-id="JXadOfHE6X74wf4ObaiV7l">建议</th></tr></thead>
+  <tbody data-page-node-id="nTDWvPrh87jpfqF7Le1QyP">
+    <tr data-page-node-id="TrlmxOLbMsThrmHljIps0G"><td data-page-node-id="zPyP42UDpbjslugooFZgw5">球半径</td><td data-page-node-id="0I8VHyDEgeMjfII1uKIMEG">固定 14.1u</td><td data-page-node-id="eh401QID2i10y1nBVh87tx">随呼吸 ±8.5%</td><td data-page-node-id="0YnWo89RUQRZGm4GYVICpI">加 ±8.5% 缩放（可用单独 SMIL，与深眼同相位）</td></tr>
+    <tr data-page-node-id="JVVivwwMq97qUMviX5wrLR"><td data-page-node-id="DGBFtb06vtL4V2ENMHX05z">球心距</td><td data-page-node-id="oiDoDyy5fAKQnhck2rRjDR">随深眼联动（+14.4）</td><td data-page-node-id="gtV100muPePtxOXqZY0qig">随呼吸 ±6.5%，与深眼同相</td><td data-page-node-id="n5eac3FXCdzNbgNpbDQYZm">保持联动即可，幅度接近</td></tr>
+    <tr data-page-node-id="sQ3Mhu49PPX5kaimSYHmzJ"><td data-page-node-id="yBtDmW7BRgvPP2KMQcTPoL">与深眼关系</td><td data-page-node-id="RDKQRH5ArlLHAuGxDF4BqK">内缘相切</td><td data-page-node-id="eLRWF73uTSD8WEzz1kkcTv">内缘压过深眼约 3.8px</td><td data-page-node-id="h10vnRb6f34mZu4IS2qliJ">把偏移从 +14.4 减到约 <b data-page-node-id="SF6s4USuhMQqijmylFr3tX">+11~12</b>，让球压进去一点</td></tr>
+    <tr data-page-node-id="PubGpovJnDaF3l7WJnQ5uR"><td data-page-node-id="DDaoEDYLAeNxuJq4zf6vCd">分离帧</td><td data-page-node-id="aH1V2aVdQrfFxto3sgFSGu">无</td><td data-page-node-id="N5VFWcBXIZBZaJBE40rF6S">约 1.8% 帧出现</td><td data-page-node-id="jFrAeYqUxoPigHDWbVvwkO">可忽略（视觉上就是收缩末端的一瞬）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 data-page-node-id="dH10T1qUZK1qiGklcqsDEc">附：原生素材为什么没测成</h2>
+<p class="meta" data-page-node-id="ioi8fka6gGDpMOkqP1tOhX">
+<code data-page-node-id="KIwLuGkGignw5QUroILx2U">20-36-47.mkv</code> 虽然帧率原生、码率 24 Mbps，但环形核的眼睛区域存在两种问题：
+</p>
+<figure data-page-node-id="7DS8tALLUfRUH52rqDzwIp">
+  <img src="glint_zoom_compare.png" alt="两素材眼睛区放大对比" data-page-node-id="Hi8pD0fKVEEt7nwgTEN3tB">
+  <figcaption data-page-node-id="DncFn1NsgnDyW2QXmEIXud">左：原生 120fps 素材的眼睛区（放大 3 倍）——有横向拉丝/撕裂，边缘被破坏；
+    右：旧素材同样区域——结构干净。撕裂集中出现在 5–6s 附近，其余时段正常，但整体泛光仍比旧素材重。</figcaption>
+</figure>
+<p class="note" data-page-node-id="UdzJFnQXHSpMJXDvAOwM2l">
+  另外它的白环内缘在泛光下整圈都超过高光阈值，任何全局阈值法都会把整条白环卷进来
+  （质心被拉回圆心）。这一版改用固定窗口 + 紧阈值后已经能避开，但在该素材上仍不如旧素材稳定
+  （球心距测到 93px，旧素材 76px）——<b data-page-node-id="hgIRIXtIPuVEDXwcjrNmpM">所以本报告全部结论基于旧素材</b>。
+</p>
+<p class="meta" style="margin-top:26px" data-page-node-id="6JzyDb8m7pGpdgW1vBEogz">
+  脚本：<code data-page-node-id="Pj03KrdY8KsAIDcF32XPH8">scripts/_glint_v4.py</code>（固定窗口质心法）· <code data-page-node-id="4wnQWmmD4upMvYoqdLkC0r">scripts/_glint_radial.py</code>（定向剖面）·
+  <code data-page-node-id="Nd7X1vgAv47cms75Qzwpjj">scripts/_glint_analyze.py</code>（周向去背景）<br data-page-node-id="Xe6N7s9uROmeP8GDitfMmo">
+  数据：<code data-page-node-id="zJmIurvct7euvLAjWW2vJ4">dev/glint_v4_old.json</code> · <code data-page-node-id="KtpmDG0CvFWybH0WS6kzOD">dev/glint_v4_native.json</code> ·
+  <code data-page-node-id="PtiPSbaxT92BlZsMVDFvGX">dev/glint_radial_native.json</code>
+</p>
+
+</body>
+</html>

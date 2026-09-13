@@ -254,22 +254,28 @@
                               calcMode="spline"
                               keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
                               dur="0.7s" repeatCount="indefinite" data-page-node-id="puPul2qQkL2vXyP8mJ3cRb"/>
-            <circle id="irisPupil" r="19.9" fill="url(#gPupil)"
+            <circle id="irisPupil" r="14.9" fill="url(#gPupil)"
                     stroke="#F4F6FF" stroke-width="0.6" stroke-opacity="0.8" data-page-node-id="FDTZC9JmkBpxEmVuqRDdRf"/>
-          </g>
 
-          <!-- 中央高光球 (2026-09-13 全部按 60fps 实测重做):
-               尺寸恒定 (与呼吸零相关, ±1%), 不再跟蓝瞳缩放;
-               位置随呼吸小幅摆动 ±(0.3,0.6)u (呼吸锁相, 谷相位=0) -->
-          <g id="glintPulse" data-page-node-id="glPul1qQkL2vXyP8mJ3cRc">
-            <g id="glintG" data-page-node-id="oE0qX304rCNEGHA4VRCDfg">
-              <animateTransform id="glintSwayAnim" attributeName="transform" type="translate"
-                                values="-0.12 -0.32;-0.03 -0.16;0.08 0.13;0.14 0.32;0.15 0.33;0.15 0.32;0.08 0.11;-0.1 -0.31;-0.38 -0.85;-0.38 -0.74;-0.21 -0.48;-0.12 -0.32"
-                                keyTimes="0;0.05;0.15;0.25;0.35;0.45;0.55;0.65;0.75;0.85;0.95;1"
-                                calcMode="spline"
-                                keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"
-                                dur="0.867s" repeatCount="indefinite" data-page-node-id="kcbEYtCGlG9V1MMTfjXbCI"/>
-              <circle cx="20.2" cy="27.2" r="14.1" fill="url(#gGlint)" data-page-node-id="pS8jeSgUcQ2VHJ5kIFXse2"/>
+            <!-- 中央高光球 (2026-09-13 21:10 按新实测改为"随深眼一起缩放"):
+                 实测(旧素材 12s, 固定窗口 + 紧阈值取最亮核心):
+                   球核心半径随呼吸 ±8.5%, 球心距随呼吸 ±6.5%,
+                   与深眼同相位(相位差 <10ms), 相对振幅 8.5% vs 深眼 7.3%
+                 ⇒ 球实际就在深眼的缩放组里 —— 这正是"内缘始终贴着深眼"的原因:
+                   两者同步缩放时, 内缘与深眼边缘的相对关系天然保持不变。
+                 ⚠ 旧记录"高光尺寸恒定、与呼吸零相关(±1%)"是错的: 那是用连通域按 max-10
+                   取全轮廓测的, 把渐变边缘一起算进去, 正好把变化平均掉了。
+                 位置另叠加实测的小幅摆动 ±(0.3,0.6)u (随呼吸锁相, 谷相位=0)。 -->
+            <g id="glintPulse" data-page-node-id="glPul1qQkL2vXyP8mJ3cRc">
+              <g id="glintG" data-page-node-id="oE0qX304rCNEGHA4VRCDfg">
+                <animateTransform id="glintSwayAnim" attributeName="transform" type="translate"
+                                  values="-0.12 -0.32;-0.03 -0.16;0.08 0.13;0.14 0.32;0.15 0.33;0.15 0.32;0.08 0.11;-0.1 -0.31;-0.38 -0.85;-0.38 -0.74;-0.21 -0.48;-0.12 -0.32"
+                                  keyTimes="0;0.05;0.15;0.25;0.35;0.45;0.55;0.65;0.75;0.85;0.95;1"
+                                  calcMode="spline"
+                                  keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"
+                                  dur="0.867s" repeatCount="indefinite" data-page-node-id="kcbEYtCGlG9V1MMTfjXbCI"/>
+                <circle cx="20.2" cy="27.2" r="14.1" fill="url(#gGlint)" data-page-node-id="pS8jeSgUcQ2VHJ5kIFXse2"/>
+              </g>
             </g>
           </g>
 
@@ -377,7 +383,7 @@
     <label class="sl" data-page-node-id="GQLjUXLRp2CKRiz1Z3X0P7"><span data-page-node-id="ejeHqiYWxZkTM61d44qa7H">靛蓝环带外缘</span><input type="range" id="pInd" min="70" max="86" step="0.5" value="78.1" data-page-node-id="h5Eh99CmqhfTXeVgSB5cUf"><b id="vInd" data-page-node-id="ljpJh80yQ5mnVEc52yIqLJ">78.1</b></label>
     <label class="sl" data-page-node-id="GCZPy0ujTaDkrnCdq3V9kD"><span data-page-node-id="ScqNyiRiNSyERt2D7H9AA1">白环外缘</span><input type="range" id="pWhite" min="56" max="74" step="0.1" value="62.2" data-page-node-id="9DmdchNf2b6mxE8lFbrXkP"><b id="vWhite" data-page-node-id="swwiZFALrUzGA1TIJnqrPN">62.2</b></label>
     <label class="sl" data-page-node-id="jEnOtY23m2GRY7OE1UpKmq"><span data-page-node-id="LNVHGZgNaHHJHFMnNrXakZ">白环内缘</span><input type="range" id="pWhIn" min="38" max="52" step="0.5" value="41.5" data-page-node-id="CcG73rm28IFWQYDFrJyqrs"><b id="vWhIn" data-page-node-id="l2YzMuApO36vjHA8t6bLPO">41.5</b></label>
-    <label class="sl" data-page-node-id="p4fXKNjVMGmsX1wU8nmmRI"><span data-page-node-id="L1Bo91UGDOCiQmXhT8hQIZ">虹膜半径</span><input type="range" id="pIris" min="12" max="34" step="0.1" value="19.9" data-page-node-id="HarL6awP9AvDhKKZWPXBDJ"><b id="vIris" data-page-node-id="YwH39x0QdW0RPIORhKW4UM">19.9</b></label>
+    <label class="sl" data-page-node-id="p4fXKNjVMGmsX1wU8nmmRI"><span data-page-node-id="L1Bo91UGDOCiQmXhT8hQIZ">虹膜半径</span><input type="range" id="pIris" min="12" max="34" step="0.1" value="14.9" data-page-node-id="HarL6awP9AvDhKKZWPXBDJ"><b id="vIris" data-page-node-id="YwH39x0QdW0RPIORhKW4UM">14.9</b></label>
     <label class="sl" data-page-node-id="Ga223bFVMn1mAlRXCm3CDz"><span data-page-node-id="uQ7sN8P99UzS0aFOPEOwi0">尖齿顶端半径</span><input type="range" id="pTip" min="80" max="99" step="0.5" value="93.0" data-page-node-id="biyaXtj1A4f96WYFARC1vw"><b id="vTip" data-page-node-id="mzD82ZroEBIO2Qmzs5wQ6Q">93.0</b></label>
     <label class="sl" data-page-node-id="wX6na5ExDhTx8Sh4xFWHeV"><span data-page-node-id="hQQUud6KcXYBDtFpnheoPl">尖齿基底半角°</span><input type="range" id="pHalf" min="4" max="20" step="0.5" value="12.5" data-page-node-id="cfysTJYhw4EVRDB22ZIE05"><b id="vHalf" data-page-node-id="wh3ARR3T3ie0cvE0UU5bNc">12.5</b></label>
     <label class="sl" data-page-node-id="znVIwWFfERwC51pg6CaiVO"><span data-page-node-id="BfDgtUAHzgzq7Wj5Chpgd6">高光半径</span><input type="range" id="pGlint" min="8" max="20" step="0.1" value="14.1" data-page-node-id="GaA18Pd7H3ETMio063Vc1C"><b id="vGlint" data-page-node-id="TmxkF6YWt4fEAfEwnxp5J1">14.1</b></label>
@@ -478,11 +484,14 @@ bind('pInd',   'vInd',   v => { P.base = v; buildIndigo(); });
 bind('pWhite', 'vWhite', v => document.getElementById('lyWhite').setAttribute('r', v));
 bind('pWhIn',  'vWhIn',  v => document.getElementById('lySlate').setAttribute('r', v));
 /* 高光位置联动 (用户 2026-09-13 反馈: "白色的大圆的周围高光也没跟着圆一起运动"):
-   实测锚点: 高光盘心 (20.2,27.2), 中心距 34.3u ≈ 深眼 19.9 + 间隙 14.4;
-   调深眼半径时高光沿原版方向滑动, 高光内缘与深眼边缘的相对关系保持不变;
-   呼吸不联动 — 60fps 全片追踪: 高光与呼吸零相关(±1%), 原版高光不随呼吸缩放 */
+   实测锚点(原版): 高光盘心 (20.2,27.2), 中心距 34.3u ≈ 原深眼 19.9 + 间隙 14.4;
+   2026-09-13 深眼半径下调 19.9 → 17.9 (用户: "最小的圆, 把最小直径再改小点"),
+   高光沿原方向同步内移 → d = 17.9 + 14.4 = 32.3;
+   2026-09-13 21:10 按高光专项实测再修: 球内缘是**压过**深眼边缘约 1.7u(不是相切),
+   故间隙 14.4 → 12.5 ⇒ d = rp + 12.5。球已移入 pupilPulse 随深眼同比缩放,
+   这 1.7u 压入量因此等比保持 —— 与实测"98.2% 的帧内缘都压进深眼"一致。 */
 function updateGlint(rp){
-  const d = rp + 14.4;
+  const d = rp + 12.5;
   const c = document.querySelector('#glintG > circle');
   c.setAttribute('cx', (20.2/34.3*d).toFixed(2));
   c.setAttribute('cy', (27.2/34.3*d).toFixed(2));
@@ -502,29 +511,38 @@ bind('pGear',  'vGear',  v => {
 }, v => String(v));
 /* 呼吸脉冲：逐环独立幅度 + 相位差 + 不对称曲线
    幅度从内到外递减: 深眼 ±9.9% > 蓝瞳 ±6.0% > 灰紫蓝 ±5.5% > 白环 ±4.1%
-   相位: 内环超前外环, 每环差 ~0.031s (60fps 实录 20260913-130732.mp4 互相关实测)
+   相位 (2026-09-13 晚 改为按实测值):
+       由内向外扩散 —— 深眼最先 → 蓝瞳 → 灰紫蓝 → 白环最晚。
+       两段独立素材(旧 60fps 高码率 / 新原生 120fps)用"窄环带 + 单频 DFT"实测的相对相位平均后:
+         深眼比白环早 96ms, 蓝瞳早 61ms, 灰紫蓝早 39ms, 白环 0
+       即相邻层间隔 35 / 22 / 39ms, 总跨度 96ms
+       (早先设的"每层固定 50ms、共 150ms"比两段素材实测都大, 已废弃)
    曲线 (60fps 逐周期实测重拟合, 无平顶段——峰驻留来自缓动形状):
    谷停 15.5% + 慢升 53.3% (.3 0 .3 1) + 缓降 31.2% (.5 0 1 1, 顶部零斜率=顶峰停顿感) */
 function applyBreath(){
   const T = parseFloat(document.getElementById('pBreath').value);
   const strength = parseFloat(document.getElementById('pBreathStr').value) / 100;
-  // [id, 幅度, 相位偏移(负=超前)]  内环超前外环, 每环差 ~0.031s
+  // [id, 幅度, 启动延迟 s]  由内到外排列: 索引 0 = 最小环
   const RINGS = [
-    ['whitePulseAnim', 0.041,  0.000],   // 白环 ±4.1%, 基准(最晚)
-    ['slatePulseAnim', 0.055, -0.031],   // 灰紫蓝 ±5.5%, 超前 0.031s
-    ['midPulseAnim',   0.060, -0.062],   // 蓝瞳 ±6.0%, 超前 0.062s
-    ['pupilPulseAnim', 0.099, -0.093],   // 深眼 ±9.9%, 超前 0.093s (按每环 0.031s 外推)
+    ['pupilPulseAnim', 0.099, 0.000],   // 深眼    ±9.9%, 最小 → 最先动
+    ['midPulseAnim',   0.060, 0.035],   // 蓝瞳    ±6.0%, 比深眼晚 35ms
+    ['slatePulseAnim', 0.055, 0.057],   // 灰紫蓝  ±5.5%, 比蓝瞳晚 22ms
+    ['whitePulseAnim', 0.041, 0.096],   // 白环    ±4.1%, 比灰紫蓝晚 39ms
   ];
   // 高光摆动与呼吸锁相 (实测), 只同步周期不缩放
   const sway = document.getElementById('glintSwayAnim');
   if (sway) sway.setAttribute('dur', T + 's');
-  for (const [id, amp, phase] of RINGS) {
+  for (const [id, amp, delay] of RINGS) {
     const el = document.getElementById(id);
     if (!el) continue;
     const a = amp * strength;
     const lo = (1 - a).toFixed(4);
     el.setAttribute('dur', T + 's');
-    el.setAttribute('begin', phase + 's');
+    // begin 只写一次: 拖动滑条改 dur 时若同时重写 begin, SMIL 会重启动画 → 外环闪断
+    if (el.dataset.delayInit !== '1'){
+      el.setAttribute('begin', delay.toFixed(3) + 's');
+      el.dataset.delayInit = '1';
+    }
     el.setAttribute('values', `${lo};${lo};1;${lo}`);
     el.setAttribute('keyTimes', '0;0.155;0.688;1');
     el.setAttribute('calcMode', 'spline');

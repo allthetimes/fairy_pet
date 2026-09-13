@@ -1,0 +1,38 @@
+{
+  "video": "2026-09-13 20-36-47.mkv",
+  "frames": 1080,
+  "f0": 1.17348,
+  "T": 0.85217,
+  "bands": {
+    "深眼边缘带": {
+      "amp": 6.05,
+      "phase_ms_vs_white": -349.5,
+      "snr": 2.88,
+      "u_center": 0.18
+    },
+    "蓝瞳边缘带": {
+      "amp": 13.265,
+      "phase_ms_vs_white": -366.0,
+      "snr": 4.68,
+      "u_center": 0.29
+    },
+    "灰紫蓝边缘带": {
+      "amp": 4.99,
+      "phase_ms_vs_white": -382.5,
+      "snr": 5.3,
+      "u_center": 0.41
+    },
+    "白环边缘带": {
+      "amp": 12.434,
+      "phase_ms_vs_white": 0.0,
+      "snr": 5.08,
+      "u_center": 0.63
+    },
+    "外圈蓝边缘带": {
+      "amp": 0.938,
+      "phase_ms_vs_white": 111.5,
+      "snr": 0.13,
+      "u_center": 1.0
+    }
+  }
+}

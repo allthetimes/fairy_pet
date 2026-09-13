@@ -1,0 +1,152 @@
+{
+  "video": "2026-09-13 20-24-36.mkv",
+  "fps": 120.0,
+  "frames": 1080,
+  "duration_s": 8.99,
+  "period_s": 0.86,
+  "R_px": 217.82,
+  "cx": 462.16,
+  "cy": 507.77,
+  "unit": "svg_r = u*100, 外圈=100",
+  "rings": {
+    "深眼外缘": {
+      "svg_diam_mean": 45.37,
+      "svg_diam_max": 47.38,
+      "svg_diam_min": 43.36,
+      "px_diam_mean": 98.8,
+      "px_diam_max": 103.2,
+      "px_diam_min": 94.5,
+      "svg_r_mean": 22.68,
+      "svg_r_max": 23.69,
+      "svg_r_min": 21.68,
+      "amp_pct": 4.42,
+      "range_pct": 8.84,
+      "raw_range_pct": 24.29,
+      "resid_pct": 5.04,
+      "phase_rad": 0.8905,
+      "valid_frames": 1080,
+      "quantile_diam_pct": [
+        39.57,
+        49.58
+      ],
+      "phase_ms_vs_white": 341.8
+    },
+    "蓝瞳外缘": {
+      "svg_diam_mean": 53.15,
+      "svg_diam_max": 57.28,
+      "svg_diam_min": 49.02,
+      "px_diam_mean": 115.8,
+      "px_diam_max": 124.8,
+      "px_diam_min": 106.8,
+      "svg_r_mean": 26.57,
+      "svg_r_max": 28.64,
+      "svg_r_min": 24.51,
+      "amp_pct": 7.77,
+      "range_pct": 15.55,
+      "raw_range_pct": 50.96,
+      "resid_pct": 4.5,
+      "phase_rad": 1.2551,
+      "valid_frames": 1080,
+      "quantile_diam_pct": [
+        48.2,
+        70.43
+      ],
+      "phase_ms_vs_white": 391.7
+    },
+    "灰紫蓝外缘": {
+      "svg_diam_mean": 78.52,
+      "svg_diam_max": 80.76,
+      "svg_diam_min": 76.28,
+      "px_diam_mean": 171.0,
+      "px_diam_max": 175.9,
+      "px_diam_min": 166.2,
+      "svg_r_mean": 39.26,
+      "svg_r_max": 40.38,
+      "svg_r_min": 38.14,
+      "amp_pct": 2.86,
+      "range_pct": 5.71,
+      "raw_range_pct": 11.69,
+      "resid_pct": 3.09,
+      "phase_rad": -2.5847,
+      "valid_frames": 1080,
+      "quantile_diam_pct": [
+        76.21,
+        84.93
+      ],
+      "phase_ms_vs_white": -133.8
+    },
+    "白环外缘": {
+      "svg_diam_mean": 129.03,
+      "svg_diam_max": 144.04,
+      "svg_diam_min": 114.02,
+      "px_diam_mean": 281.1,
+      "px_diam_max": 313.7,
+      "px_diam_min": 248.4,
+      "svg_r_mean": 64.51,
+      "svg_r_max": 72.02,
+      "svg_r_min": 57.01,
+      "amp_pct": 11.63,
+      "range_pct": 23.27,
+      "raw_range_pct": 24.55,
+      "resid_pct": 5.47,
+      "phase_rad": -1.607,
+      "valid_frames": 1080,
+      "quantile_diam_pct": [
+        112.02,
+        143.7
+      ],
+      "phase_ms_vs_white": 0.0
+    },
+    "靛蓝外缘": {
+      "svg_diam_mean": 166.28,
+      "svg_diam_max": 166.37,
+      "svg_diam_min": 166.2,
+      "px_diam_mean": 362.2,
+      "px_diam_max": 362.4,
+      "px_diam_min": 362.0,
+      "svg_r_mean": 83.14,
+      "svg_r_max": 83.19,
+      "svg_r_min": 83.1,
+      "amp_pct": 0.05,
+      "range_pct": 0.1,
+      "raw_range_pct": 1.1,
+      "resid_pct": 0.14,
+      "phase_rad": -2.2705,
+      "valid_frames": 1080,
+      "quantile_diam_pct": [
+        166.19,
+        167.11
+      ],
+      "phase_ms_vs_white": -90.8
+    },
+    "外圈蓝外缘": {
+      "svg_diam_mean": 199.08,
+      "svg_diam_max": 199.9,
+      "svg_diam_min": 198.25,
+      "px_diam_mean": 433.6,
+      "px_diam_max": 435.4,
+      "px_diam_min": 431.8,
+      "svg_r_mean": 99.54,
+      "svg_r_max": 99.95,
+      "svg_r_min": 99.12,
+      "amp_pct": 0.41,
+      "range_pct": 0.83,
+      "raw_range_pct": 11.3,
+      "resid_pct": 1.62,
+      "phase_rad": 0.073,
+      "valid_frames": 1080,
+      "quantile_diam_pct": [
+        180.42,
+        202.0
+      ],
+      "phase_ms_vs_white": 229.9
+    }
+  },
+  "mine_svg_r": {
+    "深眼外缘": 17.9,
+    "蓝瞳外缘": 28.1,
+    "灰紫蓝外缘": 41.5,
+    "白环外缘": 62.2,
+    "外圈蓝外缘": 100.0
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "video": "20260913-130732.mp4",
+  "frames": 300,
+  "period_s": 0.8584,
+  "edge_defs": {
+    "A_深蓝填充外缘": {
+      "u_mean": 0.1808,
+      "svg_r_mean": 18.08,
+      "svg_diam_mean": 36.16,
+      "svg_diam_max": 39.64,
+      "svg_diam_min": 32.68,
+      "svg_r_max": 19.82,
+      "svg_r_min": 16.34,
+      "amp_pct": 9.62,
+      "resid_pct": 4.54,
+      "valid": 300
+    },
+    "B_最陡过渡沿": {
+      "u_mean": 0.1841,
+      "svg_r_mean": 18.41,
+      "svg_diam_mean": 36.82,
+      "svg_diam_max": 40.93,
+      "svg_diam_min": 32.71,
+      "svg_r_max": 20.47,
+      "svg_r_min": 16.36,
+      "amp_pct": 11.16,
+      "resid_pct": 2.79,
+      "valid": 300
+    },
+    "C_白描边峰": {
+      "u_mean": 0.2172,
+      "svg_r_mean": 21.72,
+      "svg_diam_mean": 43.44,
+      "svg_diam_max": 46.42,
+      "svg_diam_min": 40.46,
+      "svg_r_max": 23.21,
+      "svg_r_min": 20.23,
+      "amp_pct": 6.86,
+      "resid_pct": 9.7,
+      "valid": 300
+    },
+    "D_白描边外缘": {
+      "u_mean": 0.5782,
+      "svg_r_mean": 57.82,
+      "svg_diam_mean": 115.64,
+      "svg_diam_max": 138.82,
+      "svg_diam_min": 92.47,
+      "svg_r_max": 69.41,
+      "svg_r_min": 46.23,
+      "amp_pct": 20.04,
+      "resid_pct": 17.61,
+      "valid": 300
+    }
+  }
+}

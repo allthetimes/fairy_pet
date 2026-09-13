@@ -1,0 +1,14 @@
+{
+  "src": "D:/allthetimes/Videos/2026-09-13 20-24-36.mkv",
+  "t": 10.0,
+  "cx": 467.57,
+  "cy": 511.0,
+  "R_px": 217.58,
+  "R_from_blue_edge": 217.0,
+  "R_from_white_edge": 218.16,
+  "white_edge_resid_px": 6.42,
+  "frame": [
+    1920,
+    1080
+  ]
+}

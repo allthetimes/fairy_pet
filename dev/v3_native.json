@@ -1,0 +1,80 @@
+{
+  "video": "2026-09-13 20-36-47.mkv",
+  "frames": 1080,
+  "period_s": 0.851,
+  "R_px": 217.58,
+  "rings": {
+    "深眼外缘": {
+      "sample_u": 0.1655,
+      "channel": "L",
+      "r_edge_px": 36.0,
+      "grad": 1.194,
+      "dr_px": 7.823,
+      "amp_pct": 21.73,
+      "snr": 3.6,
+      "phase_rad": -2.2542,
+      "svg_diam_mean": 33.09,
+      "phase_ms_vs_white": -68.7
+    },
+    "蓝瞳外缘": {
+      "sample_u": 0.301,
+      "channel": "L",
+      "r_edge_px": 65.5,
+      "grad": 1.6006,
+      "dr_px": 9.738,
+      "amp_pct": 14.87,
+      "snr": 7.2,
+      "phase_rad": -2.1632,
+      "svg_diam_mean": 60.21,
+      "phase_ms_vs_white": -56.4
+    },
+    "灰紫蓝外缘": {
+      "sample_u": 0.5148,
+      "channel": "L",
+      "r_edge_px": 112.0,
+      "grad": 1.4783,
+      "dr_px": 10.571,
+      "amp_pct": 9.44,
+      "snr": 5.4,
+      "phase_rad": 1.4786,
+      "svg_diam_mean": 102.95,
+      "phase_ms_vs_white": -414.2
+    },
+    "白环外缘": {
+      "sample_u": 0.6457,
+      "channel": "BR",
+      "r_edge_px": 140.5,
+      "grad": 1.4786,
+      "dr_px": 4.902,
+      "amp_pct": 3.49,
+      "snr": 2.5,
+      "phase_rad": -1.7467,
+      "svg_diam_mean": 129.15,
+      "phase_ms_vs_white": 0.0
+    },
+    "靛蓝外缘": {
+      "sample_u": 0.8526,
+      "channel": "L",
+      "r_edge_px": 185.5,
+      "grad": 2.5931,
+      "dr_px": 0.423,
+      "amp_pct": 0.23,
+      "snr": 0.2,
+      "phase_rad": 2.4816,
+      "svg_diam_mean": 170.51,
+      "phase_ms_vs_white": -278.3
+    },
+    "外圈蓝外缘": {
+      "sample_u": 0.8801,
+      "channel": "BR",
+      "r_edge_px": 191.5,
+      "grad": 0.7952,
+      "dr_px": 1.343,
+      "amp_pct": 0.7,
+      "snr": 0.9,
+      "phase_rad": -1.6805,
+      "svg_diam_mean": 176.03,
+      "phase_ms_vs_white": 9.0
+    }
+  }
+}

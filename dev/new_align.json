@@ -1,0 +1,14 @@
+{
+  "src": "D:/allthetimes/Videos/2026-09-13 20-02-18.mp4",
+  "t": 60.0,
+  "cx": 488.06,
+  "cy": 514.84,
+  "R_px": 217.3,
+  "R_from_blue_edge": 217.0,
+  "R_from_white_edge": 217.59,
+  "white_edge_resid_px": 6.64,
+  "frame": [
+    1920,
+    1080
+  ]
+}

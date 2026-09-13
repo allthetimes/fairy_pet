@@ -1,0 +1,50 @@
+{
+  "samples": 242,
+  "span_ms": 2004.5,
+  "rings": {
+    "irisPupil": {
+      "min": 1.4183,
+      "max": 1.5893,
+      "valleys_ms": [
+        129.5,
+        987.9,
+        1846.3
+      ],
+      "period_ms": 858.4,
+      "first_valley_ms": 987.9
+    },
+    "irisMid": {
+      "min": 1.645,
+      "max": 1.7664,
+      "valleys_ms": [
+        1029.5,
+        1879.4
+      ],
+      "period_ms": 849.9,
+      "first_valley_ms": 1879.4,
+      "lag_vs_pupil_ms": 33.1
+    },
+    "lySlate": {
+      "min": 1.6538,
+      "max": 1.7661,
+      "valleys_ms": [
+        1054.5,
+        1904.7
+      ],
+      "period_ms": 850.2,
+      "first_valley_ms": 1904.7,
+      "lag_vs_pupil_ms": 58.4
+    },
+    "lyWhite": {
+      "min": 1.6783,
+      "max": 1.7687,
+      "valleys_ms": [
+        1096.1,
+        1937.8
+      ],
+      "period_ms": 841.7,
+      "first_valley_ms": 1937.8,
+      "lag_vs_pupil_ms": 91.5
+    }
+  }
+}

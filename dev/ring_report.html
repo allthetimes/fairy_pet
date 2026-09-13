@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="qvzckdZPv4AKXDyiB1FACE">
+<head data-page-node-id="5Wl050nWTFS9z9tOBvvC4R">
+<meta charset="utf-8" data-page-node-id="GTUG0xSokHj4KJDA2GCHDe">
+<title>原版各圆直径实测 · Fairy 环形核</title>
+<style>
+  :root{--ink:#1b2030;--sub:#5c657a;--line:#e2e6ef;--bg:#f7f8fb;--acc:#2b4fd8;--acc2:#c2410c;--warn:#b45309}
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 40px 56px;background:#fff;color:var(--ink);
+       font:14px/1.65 -apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+  h1{font-size:21px;margin:0 0 6px;letter-spacing:.2px}
+  h2{font-size:15px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .meta{color:var(--sub);font-size:12.5px;margin:0 0 22px;line-height:1.9}
+  .meta code{background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px}
+  table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+  th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  thead th{background:var(--bg);color:var(--sub);font-weight:600;font-size:12px;
+           border-bottom:1px solid #d5dae6;white-space:nowrap}
+  tbody tr:hover{background:#fafbfe}
+  .dim{color:var(--sub)}
+  .bad{color:var(--warn)}
+  .good{color:#0f7a3d}
+  .lead{color:var(--acc);font-weight:600}
+  .note{background:var(--bg);border-left:3px solid var(--acc);padding:10px 14px;
+        font-size:13px;color:#39415a;border-radius:0 6px 6px 0;margin:14px 0 0}
+  .note b{color:var(--ink)}
+  .wrap{overflow-x:auto}
+</style>
+</head>
+<body data-page-node-id="GoH5AjuczJsjiN7cr4P6mt">
+
+<h1 data-page-node-id="65Ep0gbwt0MbIgesYww6Bl">原版各圆直径实测</h1>
+<p class="meta" data-page-node-id="Vge74z4fNpqvgcPwG0kaXv">
+源素材 <code data-page-node-id="XnE3l2Uh9iVIkOCTeI2mTu">dev/20260913-130732.mp4</code> — 1920×1080 · 60fps · 12.03s<br data-page-node-id="9i0ygauuKtpImvqYQ2hNyQ">
+采样 9.0s / 540 帧 · 周期精定 <b data-page-node-id="dC6aTNA8zajbHvg17AZxqK">0.8584s</b>（白环拟合残差最小；align_data 记录 0.8667s，差 −8.3ms）<br data-page-node-id="CksTITrOb6bI8C80HoKHC0">
+标定：圆心 (470.47, 539.34) · 外圈 R = 216.77px ⇒ <b data-page-node-id="ctI1KXMEQWbRAGlOkb3NVy">外圈 = 100 SVG 单位</b>，下表一律用该单位（页面里 lab 的坐标系）<br data-page-node-id="hdFYvtCcpWTPlx0gxO06P7">
+方法：720 角 × 0.5px 亚像素径向剖面 → 各环边缘／颜色掩膜 → <b data-page-node-id="LkuMB73YYU8C0ozK1xTHV2">正弦最小二乘拟合</b>得均值与真实振幅（不用 raw 极值，后者被噪声放大）
+</p>
+
+<h2 data-page-node-id="HtZCxpPJRno2fNQKHMHjbT">各圆直径（呼吸周期内）</h2>
+<div class="wrap" data-page-node-id="WQAnyM9s8alCD7lLs6aBOp">
+<table data-page-node-id="4lkyZDQk7zSEypN40uQRIZ">
+  <thead data-page-node-id="NtU0rFBKYIrtdQJgy23BV6">
+    <tr data-page-node-id="NVUicy2UmmAiDZejt0TfEj"><th data-page-node-id="ZTkYLYmZ9nay11c2hvTiwO">圆（外缘）</th><th data-page-node-id="SYEbUCgSICl7iuOdzdrB4C">Ø 均值</th><th data-page-node-id="MxTEY5Ae74awGD2lmfSFMO">Ø 最大</th><th data-page-node-id="ogsc0zkY8Ag1oII0DlHlvH">Ø 最小</th><th data-page-node-id="cAT9KXR2cNIkTWZfuEWQnE">振幅</th><th data-page-node-id="NrW4Slar1j4lrO3ULFuan9">均值(px)</th><th data-page-node-id="bFhLnFWZqE2Q2pPoBw1how">拟合残差</th><th data-page-node-id="tGJu0JAiV7I1RdJ5S7mot9">相位 vs 白环</th></tr>
+  </thead>
+  <tbody data-page-node-id="FzREwZt2Avvt58kE7DWjHa">
+    <tr data-page-node-id="Y5vizYITEfP77F3L2yw5sU"><td data-page-node-id="yJ4WI6H3cLXx9FUyy4Rb36">深眼（最小）</td><td class="lead" data-page-node-id="bSbuLGqxBUHbbHv6VlLrT2">36.08</td><td data-page-node-id="YuHCouKeqrjMQKdHYcQQXe">39.73</td><td data-page-node-id="g01STBF5SsqtGAleN1SoRz">32.44</td><td data-page-node-id="lvcmvARm5aGC3pzOpCG7b1">±10.11%</td><td data-page-node-id="idSeRe41KcZ2VD21ODYItQ">78.2</td><td data-page-node-id="hwzxjkM7OKGpiuzOE7UvQJ">3.60%</td><td data-page-node-id="xLEyQqdY2fd8XXJ4Vvuy5d">−118.9 ms</td></tr>
+    <tr data-page-node-id="i1aaHuBCu3GqCzSfQixje3"><td data-page-node-id="rBwnVTJXhNHPmSUNomWB1q">蓝瞳</td><td class="lead" data-page-node-id="GDR5V9GaSpFlXL7bVwpeAN">55.87</td><td data-page-node-id="n9LCeKsE2GMs8yTTMcM7Cz">59.38</td><td data-page-node-id="A0KDUtrppzPfpQsQ4bblvX">52.35</td><td data-page-node-id="j6IWUyMfSeZSdQGDOjNWG1">±6.29%</td><td data-page-node-id="f1Hjh6pKLj2bQNKkgFXKYg">121.1</td><td data-page-node-id="POJYGEuhspPHIK00zyMgEC">2.40%</td><td data-page-node-id="1oydpqz39F6WoW9yeoloEg">−62.8 ms</td></tr>
+    <tr data-page-node-id="GcvpqKeWBkmq6vkrCe7etC"><td data-page-node-id="2jg3HOMJmftjI39aR589GR">灰紫蓝</td><td class="lead" data-page-node-id="tSepfn69puB5tlPCfWQguA">82.01</td><td data-page-node-id="Zwb8U6FAOOdzcKLEw1QlZJ">86.92</td><td data-page-node-id="7HoXSxX3VK3R9Zj2vahhyi">77.09</td><td data-page-node-id="3KG5HwCHzC02GN4ZPPTqTo">±5.99%</td><td data-page-node-id="YEDSHdXg8qiBAaCdS2TETV">177.8</td><td data-page-node-id="52AIEJnDgF11yB1WIJhD1Y">1.55%</td><td data-page-node-id="26FM9PiE6UZsWi79fB5qVg">−35.9 ms</td></tr>
+    <tr data-page-node-id="5ymcBVfJp1jzcC6nCfiRK3"><td data-page-node-id="hmh1iQ6XBPKtSyDETbriOq">白环</td><td class="lead" data-page-node-id="hRpqeyiuRFrvq7U4Qg5ntv">123.33</td><td data-page-node-id="D26IKGeyjqCg8MxQmdBViq">129.04</td><td data-page-node-id="SEql2uEBiZD4KFUnXIWkQv">117.63</td><td data-page-node-id="wquH5yg3oCw1zKLWkxpKJO">±4.63%</td><td data-page-node-id="6iEtmJBgRtFBlon59nBG7y">267.4</td><td data-page-node-id="4YwvcdkEJ0bfH6TzLoJy0e">1.01%</td><td data-page-node-id="YH5S4Q2WjTszRX8XK874Q4">0（基准）</td></tr>
+    <tr data-page-node-id="td8zf3CWDOKUHxGWQWsF7K"><td data-page-node-id="g0sna9ytjUGvG6msHzVr9m">靛蓝环带/尖齿</td><td class="dim" data-page-node-id="tMr1eAz6pubIm7VAzwHdMZ">147.94</td><td class="dim" data-page-node-id="0QoKuemULQVDCwerqwz6Mx">156.41</td><td class="dim" data-page-node-id="2UPPeFaaoRr5xpROI9GvWk">139.46</td><td class="dim" data-page-node-id="InmeCO1CGdY9Wdd1aeaseO">±5.73%</td><td class="dim" data-page-node-id="nbjRmp3ciYgrw2OKkqGbpU">320.7</td><td class="bad" data-page-node-id="yuVKi28atnaZTYGwAhXr2W">7.51%</td><td class="bad" data-page-node-id="LIgDcTbAD7V3Z2n6xxGgnI">不可信</td></tr>
+    <tr data-page-node-id="ooTO52Adn1MEOYzdFYGh19"><td data-page-node-id="N6HOREwHsqkj7jlz8Ar5LH">外圈蓝</td><td class="lead" data-page-node-id="nZoEZItbvLFvRE1lnvKIwN">201.18</td><td data-page-node-id="1A9nOovpPmEE9MqttmuOBI">201.22</td><td data-page-node-id="cBOzhyOtH7KjjspESm4q2j">201.14</td><td class="good" data-page-node-id="g7mKCVs4KQndDfPgrSSeUl">±0.02%</td><td data-page-node-id="gMD7HLabo6MarbhgpDHwGP">436.1</td><td data-page-node-id="BO2UwKkm93Dq0Ccck2cT5g">0.43%</td><td class="dim" data-page-node-id="S0aLCOugaT3EoSurrcEcsN">—</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note" data-page-node-id="w3vKjcCUYwLACQ1LlbEzu4">
+  <b data-page-node-id="MMbpa12twtjEa9CnhkaOTc">外圈蓝确认不动</b>：±0.02%（残差 0.43%）—— 与"最外层固定、从白环开始往里呼吸"的既有结论一致。<br data-page-node-id="QBLSQphbzc1ONfXxrDLwpS">
+  <b data-page-node-id="AvGoEXNRtJq4Vli2nGbDoZ">靛蓝环带不可测</b>：径向平均剖面被 4 个尖齿的旋转调制，残差 7.51% 与振幅同量级，数值仅供占位。
+</p>
+
+<h2 data-page-node-id="QfQA1r2CoebUBUE7VdnaqX">呼吸区间（示意）</h2>
+<svg viewBox="0 0 680 320" width="100%" style="max-width:760px;font:11px -apple-system,'Microsoft YaHei',sans-serif" data-page-node-id="ZXOrLIYsev5N98aEgFq5Fn">
+  <g stroke="#e2e6ef" stroke-width="1" data-page-node-id="ArWUTstQnWjDW7FXos99oN">
+    <line x1="96" y1="52" x2="96" y2="272" data-page-node-id="HemfEjEacGlcFuHH1JwrQo"/><line x1="224.2" y1="52" x2="224.2" y2="272" data-page-node-id="G8wEHa7XoorK4g1cqSJP1J"/>
+    <line x1="352.4" y1="52" x2="352.4" y2="272" data-page-node-id="Txc9rUSWzdfmRmxPHvvuQP"/><line x1="480.6" y1="52" x2="480.6" y2="272" data-page-node-id="FvxIeL0OULUeDHs7Bz8P2N"/>
+    <line x1="608.8" y1="52" x2="608.8" y2="272" data-page-node-id="3XyxxvLMFZFzZA6Mq53GMH"/>
+  </g>
+  <g fill="#9aa3b8" font-size="10.5" text-anchor="middle" data-page-node-id="Ecl29QQKOUHJ2N9DXMLf8X">
+    <text x="96" y="288" data-page-node-id="E8BdlvSBI0mUDd03XA09B8">0</text><text x="224.2" y="288" data-page-node-id="ybAmu4wPYqZrBqBZiW68Yj">50</text><text x="352.4" y="288" data-page-node-id="vRbRBFdB3ingCJkNBjd5o0">100</text>
+    <text x="480.6" y="288" data-page-node-id="sVyczqh04GfjgkPGj0QznU">150</text><text x="608.8" y="288" data-page-node-id="mPYUCItqdTolFDeHAaPOfO">200</text>
+  </g>
+  <text x="96" y="306" fill="#9aa3b8" font-size="10.5" data-page-node-id="FSJPWiKgqz39prjrCcdSiF">SVG 单位（外圈 = 100 ⇒ Ø 200）</text>
+
+  <g font-size="12" fill="#39415a" text-anchor="end" data-page-node-id="TzWxYhzf7hQePWf01RIrda">
+    <text x="86" y="86" data-page-node-id="SWVE3B6Oa1UrvCEq6fM7o5">深眼</text><text x="86" y="128" data-page-node-id="IWJuqalfEDWT50iTTeY7Al">蓝瞳</text><text x="86" y="170" data-page-node-id="OjBZrZ1q8ECgrnCf5q6ZUv">灰紫蓝</text>
+    <text x="86" y="212" data-page-node-id="RGuHR691DpKTCj2hyLSn1C">白环</text><text x="86" y="254" data-page-node-id="uEOnSlwxyzqmunadUtVB6o">外圈蓝</text>
+  </g>
+
+  <rect x="179.2" y="72"  width="18.7" height="18" rx="4" fill="#dbe3fb" data-page-node-id="FlDB2QVJdnI5WFhlwkkcxX"/>
+  <rect x="230.2" y="114" width="18.1" height="18" rx="4" fill="#dbe3fb" data-page-node-id="ldROpM2iF1Sv6qSnWOyLsN"/>
+  <rect x="293.6" y="156" width="25.3" height="18" rx="4" fill="#dbe3fb" data-page-node-id="uwT31e3f1BksDc2g1MjTqd"/>
+  <rect x="397.6" y="198" width="29.2" height="18" rx="4" fill="#dbe3fb" data-page-node-id="YacBAQo8OnjudHid4XIoqs"/>
+  <rect x="611.7" y="240" width="0.9" height="18" rx="0.4" fill="#dbe3fb" data-page-node-id="WLNVqgYEl6kYPuy8F1OcqR"/>
+
+  <g fill="#2b4fd8" data-page-node-id="jWCnph3V9VGWq09HPwfDDj">
+    <circle cx="188.5" cy="81" r="4" data-page-node-id="4sGd9TWXYePXMg4pIZOD59"/><circle cx="239.2" cy="123" r="4" data-page-node-id="pS1J00dtRtO5FZeweS8XCD"/>
+    <circle cx="306.2" cy="165" r="4" data-page-node-id="OoQoAU5IPRAatTMUu5QIBE"/><circle cx="412.2" cy="207" r="4" data-page-node-id="ZWH367LH6K2QU9VDBsoAOC"/>
+    <circle cx="611.8" cy="249" r="4" data-page-node-id="bKEnQMA1htw7SFL1C8ckTa"/>
+  </g>
+  <g fill="#c2410c" data-page-node-id="twGi6vxTmVY9S8Y4PnsOAR">
+    <circle cx="187.8" cy="81" r="2.6" data-page-node-id="3XHnBAtyzJlxGZYBllFyLH"/><circle cx="240.1" cy="123" r="2.6" data-page-node-id="cGJ3BK1AoIKytGOtKLca6I"/>
+    <circle cx="308.8" cy="165" r="2.6" data-page-node-id="EqkDwDFcwi9Oi4bNdCXmmr"/><circle cx="414.9" cy="207" r="2.6" data-page-node-id="iOmEFHp5tI61Th8ZHYlGU2"/>
+    <circle cx="608.7" cy="249" r="2.6" data-page-node-id="ZYRfN2WzwG5JtAFIFTIEwJ"/>
+  </g>
+
+  <g font-size="11" fill="#5c657a" data-page-node-id="1AoJZrxHGFhLCKgqTbzu39">
+    <rect x="96" y="18" width="9" height="9" rx="2" fill="#dbe3fb" data-page-node-id="e92AdRrnZHRKe9Cf8sI67t"/>
+    <text x="110" y="26.5" data-page-node-id="GPaJGLp4Umadkuvy2ez43Z">呼吸区间（Ø 最小 → 最大）</text>
+    <circle cx="252" cy="22.5" r="3.4" fill="#2b4fd8" data-page-node-id="pCS83MAwaZrnnyoTvAUMhC"/>
+    <text x="262" y="26.5" data-page-node-id="k4TTTktOsf1PJ9BFYPOFec">原版均值</text>
+    <circle cx="330" cy="22.5" r="2.4" fill="#c2410c" data-page-node-id="AE8nkC7LHdDwKTNKzHDf2j"/>
+    <text x="339" y="26.5" data-page-node-id="q1z4bagwfdh3xDOusLNDaB">当前实现</text>
+  </g>
+</svg>
+
+<h2 data-page-node-id="sNm05Z0jc5t2cqBAPrAVPN">深眼外缘多口径诊断</h2>
+<p class="meta" style="margin-bottom:10px" data-page-node-id="y77tZLaivDakebuOoimSeL">
+深眼与蓝瞳之间夹着一条很弱的亮带（视频里 L≈111 vs 蓝瞳本体 105），不同判据给出的外缘相差 2–3 个单位。
+旧测量记录的 19.91 正是落在"最陡过渡沿"上，且相关系数仅 0.407 —— 逐帧在亮带两侧跳。
+</p>
+<div class="wrap" data-page-node-id="te8vYXn5TWwHur48JMNPcl">
+<table data-page-node-id="MB9qHgQBKD1RaugM5NdBB2">
+  <thead data-page-node-id="Y33Zt7GZAhwT1EzbXas0yc"><tr data-page-node-id="9yHjbMHkbM6n3cRmAeC2Fx"><th data-page-node-id="LmgDC5rMOuif6j0ShSrN4n">口径</th><th data-page-node-id="inncypVBwAjr0N100H0LIR">Ø 均值</th><th data-page-node-id="HAtgYSUyIbu2au0Mvs5Fkm">Ø 最大</th><th data-page-node-id="mf1JIwDjxCbWjayDLQPzMm">Ø 最小</th><th data-page-node-id="vSDkzUSAu2Z1XMZ2s1KcaV">振幅</th><th data-page-node-id="2aWu5b0983IebOQsfykeln">残差</th><th data-page-node-id="pEBhv1K6TYHyTetjBOluWu">评价</th></tr></thead>
+  <tbody data-page-node-id="Jt8lBcoFlyEgLFnuEroeSz">
+    <tr data-page-node-id="dppCL02nyC3zGTyeNteULQ"><td data-page-node-id="JRewWZzy6eiS8Q7A6mmkZ0">A 深蓝填充外缘</td><td data-page-node-id="dHegYWLvgxb2w4tj4olzmh">36.16</td><td data-page-node-id="xtOZE7KL91XNLhxn5FvXxs">39.64</td><td data-page-node-id="bDaWEhSahDaCGKFFZ1PrMr">32.68</td><td data-page-node-id="innErdo41lbyXpWcKbfCSp">±9.62%</td><td data-page-node-id="X5TCo6CF0c0QVtqrr8Ey3l">4.54%</td><td class="good" data-page-node-id="PBnNPM9Emf4SPb9V5AKcjK">稳定</td></tr>
+    <tr data-page-node-id="6ei2uqdF6DDzFoc1BTNh0g"><td data-page-node-id="ALSQFo3TUtW1pVSfFPlt5o">B 最陡过渡沿</td><td data-page-node-id="8s5iGQfztU6EN4umQGnCFd">36.82</td><td data-page-node-id="ubjfEa8mmV6IY73KlwCdZh">40.93</td><td data-page-node-id="R4gO3PGDc8U1FmmXD6FQ3i">32.71</td><td data-page-node-id="mCGqk6IyPzmqwnnRKkXfBx">±11.16%</td><td data-page-node-id="wjqzeWYxkUvnj3jiJyQEyi">2.79%</td><td class="good" data-page-node-id="nZJ5IZdBbU5XcM257ADmZY">残差最低（≈旧口径，但区间收窄后不再跳）</td></tr>
+    <tr data-page-node-id="dFOxRSM2AQtUUwZDaSi6Ht"><td data-page-node-id="OwlWYeTuK0mnBmMTD27C3L">C 亮带峰值</td><td class="dim" data-page-node-id="UabHkxueyNBFyZj3bhoAtE">43.44</td><td class="dim" data-page-node-id="BTXkRBUepWEJZQU5PLHVCC">46.42</td><td class="dim" data-page-node-id="jUtUjX7bwyCooxVhYyotgG">40.46</td><td class="dim" data-page-node-id="EmScfb1AChlHheEllkbmfp">±6.86%</td><td class="bad" data-page-node-id="qMELu2Al0VXUj5BBf5YvhA">9.70%</td><td class="bad" data-page-node-id="pWtqGEXgi1s2ezF4U8vQpn">亮带太弱，峰值位置不可靠</td></tr>
+    <tr data-page-node-id="T9tOZ6994ikjr9HYG5IuAH"><td data-page-node-id="a9J28gNu1oGGa7AeTfWpQt">D 亮带外缘</td><td class="dim" data-page-node-id="mnhOKc0GlaidQxPE5fgHAN">115.64</td><td class="dim" data-page-node-id="Yf1fPaDSJ4E2A4au7lQu68">138.82</td><td class="dim" data-page-node-id="RXpclGQFJmGvILSCyx8Aub">92.47</td><td class="dim" data-page-node-id="2r95LrwDwfP1CW2OEFB0BX">±20.04%</td><td class="bad" data-page-node-id="XQXrLPSbGoc2Nfwa69JxMh">17.61%</td><td class="bad" data-page-node-id="WOMRHEjmwLfiZgEH4F2Eqp">判据失效（跑到白环上）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 data-page-node-id="yZSxGgAjIt9EnhvJTg1xUG">与当前实现对照</h2>
+<div class="wrap" data-page-node-id="EjeZPYCVwUlbzd42sLfP9z">
+<table data-page-node-id="ZX6r5qNPAZJrDoU6B2KywW">
+  <thead data-page-node-id="1b1yZoOczm7wPmzv2GSNBg"><tr data-page-node-id="m6QGD3H1pBs6EaRzf0QXuG"><th data-page-node-id="KMKXeOuGBMokOARKO4nOaz">圆</th><th data-page-node-id="zcjkutxB8mUmMStUsTXqrL">原版 Ø 均值</th><th data-page-node-id="I6PMxkiIN2Ku3ZuDFrOSWG">当前实现 Ø</th><th data-page-node-id="IG0iyFORSeIqzLyuQRXeDd">差</th><th data-page-node-id="HFoz224l407QmLGejMzy7a">原版振幅</th><th data-page-node-id="FBAvW9qHEBcfpIKsxMiXCk">当前振幅</th><th data-page-node-id="Ax2j9RBgYmzdtajU2WBcuQ">差</th></tr></thead>
+  <tbody data-page-node-id="ClFKSqssbkoOIAKzhHXKJA">
+    <tr data-page-node-id="Fx1OuiI5u69lTjsXBu0ZEx"><td data-page-node-id="DXg3No64nSMeX7voPRv3j0">深眼</td><td data-page-node-id="B2yYt1QlrpvpwEU5AQG3FN">36.08</td><td data-page-node-id="WYQFUGnKrUk5ORX3DHl6JL">35.80 <span class="dim" data-page-node-id="MkFAzDQ1kePZhpVUMO500k">(r 17.9)</span></td><td class="good" data-page-node-id="oXvrgsCHkKojsAmGUlXwm0">−0.28</td><td data-page-node-id="fl5J11AicjBxePjdwralUd">±10.11%</td><td data-page-node-id="0LwfCdFaHCIAYdQ36drlgP">±9.9%</td><td class="good" data-page-node-id="0DHTfkAwGT4KMiISgn1xDr">+0.2</td></tr>
+    <tr data-page-node-id="wzkLiVMQvZELQxG67l5RwD"><td data-page-node-id="OOJkN4rZzwwuMTvPZqtV2w">蓝瞳</td><td data-page-node-id="RH0Z89BEH8iSmGfypFJhLG">55.87</td><td data-page-node-id="qBIhqmlmCEtea6VCY47UZE">56.20 <span class="dim" data-page-node-id="aDQJceAyqqA1ki7mKRKlAJ">(r 28.1)</span></td><td class="good" data-page-node-id="f4MO7FSTmjO7JkuyuYxZHO">+0.33</td><td data-page-node-id="5Jt3dloTVOW5GfuTG043gC">±6.29%</td><td data-page-node-id="n55mzcSVCdcltK5GCIs8jY">±6.0%</td><td class="good" data-page-node-id="ixg3J3kgEihr4iAzLT5eQC">+0.3</td></tr>
+    <tr data-page-node-id="eFd9HzDjKo4Ur22Bhj7RCv"><td data-page-node-id="7EPr4xvmRXQeA3KnZdhf1j">灰紫蓝</td><td data-page-node-id="ypdp1BVyywGHsn1rqCZv46">82.01</td><td data-page-node-id="7IaMaMJbgw43kMf3FmUGi8">83.00 <span class="dim" data-page-node-id="x6ExXJACKeBuKtUWKl7taM">(r 41.5)</span></td><td data-page-node-id="4RBydMBJ3vGif6AV3pMCxi">+0.99</td><td data-page-node-id="n2Fnu2yayBgf1z2IRBpTUL">±5.99%</td><td data-page-node-id="twTNBDKQMFptdpfW6LbgAH">±5.5%</td><td data-page-node-id="1S830nb82zdwfmCSfzNGSn">+0.5</td></tr>
+    <tr data-page-node-id="rujHyo58XWGi0HS0KYCA5A"><td data-page-node-id="zFWclBBImjoY7Ytt1zUxm1">白环</td><td data-page-node-id="oOSaYIlBfjaXrnxXF7NqBY">123.33</td><td data-page-node-id="niLFdOwhjAfEzFUBGKHENo">124.40 <span class="dim" data-page-node-id="iQp0Ak5HCJfaJwCWptVT8J">(r 62.2)</span></td><td data-page-node-id="B9QVMZrLnbJHkgp9qHeb9V">+1.07</td><td data-page-node-id="lrMw7rThEv1tNH9vvG5Dls">±4.63%</td><td data-page-node-id="vYQWpLhnXuQLSLoE2TXH5O">±4.1%</td><td data-page-node-id="3OMaVT5LQwOHLTlqAefzIB">+0.5</td></tr>
+    <tr data-page-node-id="kiXS7VABnenBFliWGQxfmH"><td data-page-node-id="cFRde31CyQ1bw6cat5knoc">外圈蓝</td><td data-page-node-id="j9GdpLgIJieF4M9MMQfa0T">201.18</td><td data-page-node-id="jZy30qT9c02wtIVFe6Jfgk">200.00 <span class="dim" data-page-node-id="HQhM5vcBWx0E1UoXZ3lAMV">(r 100)</span></td><td data-page-node-id="GaOV2aqc0WuhYkPZx9eSEm">−1.18</td><td data-page-node-id="lMVCbKeaHhChDYsKiuFAEb">±0.02%</td><td data-page-node-id="2ViNFBnI1dDsx7YZ7urwAJ">0（不动）</td><td class="good" data-page-node-id="mJmVJEhLDmszUwWfpDQWJl">一致</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note" data-page-node-id="kg5hS3LzZHKLpFdPTcpKAb">
+  <b data-page-node-id="bZlNx0S7RnKvSYymklcZ8F">尺寸</b>：除深眼按 A/B 口径外，其余四环与原版吻合在 <b data-page-node-id="eNAJvGd0RGl1QOce3G2EAS">1 个 SVG 单位（&lt;1.2%）</b> 内 —— 标定可靠。<br data-page-node-id="22fCMGoXXjHbTILLwGLhdV">
+  <b data-page-node-id="AFVhdrwNzb70vDUlbMJwG6">振幅</b>：当前实现的四环振幅一律偏小 0.2–0.5 个百分点，白环与灰紫蓝最明显（4.1 vs 4.63、5.5 vs 5.99）。
+  若按本次实测对齐，建议 深眼 ±10.1 / 蓝瞳 ±6.3 / 灰紫蓝 ±6.0 / 白环 ±4.6。<br data-page-node-id="O1ENEnEeiD3jJNi6d25AWV">
+  <b data-page-node-id="F2kmNUyn4r39LkCPx4fnEn">相位</b>：原版由内向外依次更早：灰紫蓝 −35.9ms → 蓝瞳 −62.8ms → 深眼 −118.9ms（相对白环）。
+  步长并非等间距（36 / 27 / 56 ms），与当前"每层固定 50ms"只是近似。
+</p>
+
+<p class="meta" style="margin-top:26px" data-page-node-id="oT6JhDe0q7RkwyFXQ6GSHZ">
+数据文件：<code data-page-node-id="CnAtbWPGNOACCqiYOzhvwY">dev/ring_diameters.json</code> · <code data-page-node-id="JYErr6rBegavZOva7Wy4id">dev/deep_edge_diag.json</code>　
+脚本：<code data-page-node-id="NuoEzxLejd2kCIg1bSQQxP">scripts/_measure_diameters.py</code> · <code data-page-node-id="WQdAAN5BEMl8wxvSoQWOQ5">scripts/_deep_edge_diag.py</code>
+</p>
+
+</body>
+</html>

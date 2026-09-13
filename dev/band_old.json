@@ -1,0 +1,38 @@
+{
+  "video": "20260913-130732.mp4",
+  "frames": 540,
+  "f0": 1.16493,
+  "T": 0.85842,
+  "bands": {
+    "深眼边缘带": {
+      "amp": 13.067,
+      "phase_ms_vs_white": -314.6,
+      "snr": 3.42,
+      "u_center": 0.18
+    },
+    "蓝瞳边缘带": {
+      "amp": 12.02,
+      "phase_ms_vs_white": -367.1,
+      "snr": 4.18,
+      "u_center": 0.29
+    },
+    "灰紫蓝边缘带": {
+      "amp": 22.091,
+      "phase_ms_vs_white": -395.5,
+      "snr": 4.74,
+      "u_center": 0.41
+    },
+    "白环边缘带": {
+      "amp": 53.231,
+      "phase_ms_vs_white": 0.0,
+      "snr": 4.42,
+      "u_center": 0.63
+    },
+    "外圈蓝边缘带": {
+      "amp": 1.254,
+      "phase_ms_vs_white": 194.9,
+      "snr": 0.22,
+      "u_center": 1.0
+    }
+  }
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="CkLRlDCi6TVYhGao2mr6PP">
+<head data-page-node-id="sB9YzFvnCmnUyJLib4molG">
+<meta charset="utf-8" data-page-node-id="p3hH0n7cJ0ilDFYHkynleB">
+<title>原生 120fps 素材验证 · Fairy 环形核</title>
+<style>
+  :root{--ink:#1b2030;--sub:#5c657a;--line:#e2e6ef;--bg:#f7f8fb;--ok:#0f7a3d;--warn:#b45309;--acc:#2b4fd8}
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 40px 60px;background:#fff;color:var(--ink);
+       font:14px/1.65 -apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+  h1{font-size:21px;margin:0 0 6px}
+  h2{font-size:15px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .meta{color:var(--sub);font-size:12.5px;margin:0 0 20px;line-height:1.9}
+  code{background:var(--bg);padding:1px 6px;border-radius:4px;font-size:12px}
+  table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+  th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  thead th{background:var(--bg);color:var(--sub);font-weight:600;font-size:12px;
+           border-bottom:1px solid #d5dae6;white-space:nowrap}
+  .ok{color:var(--ok);font-weight:600}
+  .bad{color:var(--warn)}
+  .dim{color:var(--sub)}
+  .wrap{overflow-x:auto}
+  .note{background:var(--bg);border-left:3px solid var(--acc);padding:10px 14px;font-size:13px;
+        color:#39415a;border-radius:0 6px 6px 0;margin:14px 0 0}
+  .verdict{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+  .vcard{flex:1 1 260px;min-width:240px;background:var(--bg);border-radius:8px;padding:12px 14px;font-size:13px}
+  .vcard b{display:block;font-size:13px;margin-bottom:6px}
+  .bar{height:9px;border-radius:5px;background:#dbe3fb;position:relative;min-width:2px}
+</style>
+</head>
+<body data-page-node-id="ROVTKj0JAd3xIDxz3TJHH7">
+
+<h1 data-page-node-id="9YTWOgiGpBMhkWvaBkaYG4">原生 120fps 素材验证</h1>
+<p class="meta" data-page-node-id="zscsaeRFpw53hQ2opdNdV9">
+<code data-page-node-id="0DDG2jq4C60adIRSWGPNRi">D:/allthetimes/Videos/2026-09-13 20-36-47.mkv</code> — 1920×1080 · 120fps · 20.65s · <b data-page-node-id="wHTGaV7qsfpbEs9zF6fRCt">23893 kb/s</b><br data-page-node-id="wDZfijQW3AtsKRskmHYGtA">
+标定：圆心 (467.57, 511.00) · <b data-page-node-id="P1WfiX3GIZhITh7nv7rZ3S">R = 217.58px</b> · 白环口径 218.16 / 外圈蓝口径 217.00（交叉验证 <b data-page-node-id="UQ2ml1BSt4G1CEwZBC66iA">0.53%</b>）<br data-page-node-id="7iFO8YyrXayolJE4OG5nVW">
+与旧素材 R=216.77px 差 +0.37% —— 尺寸结论继续成立
+</p>
+
+<h2 data-page-node-id="8DuCrqWuIlu99We7hBttXh">1. 关闭帧生成确认：指纹消失</h2>
+<div class="wrap" data-page-node-id="j6vriHcYXc78fTcpQ3DRJ1">
+<table data-page-node-id="D77s3nNDpgFXRchmJAVfUM">
+  <thead data-page-node-id="nXvKWf1aF5X1bUtbgPC1Tr"><tr data-page-node-id="dpn4mfYn3tLJ0OfBIiWYn7"><th data-page-node-id="bKD9Md4FhA7v9Jr4IcjQOU">素材</th><th data-page-node-id="qD4HAgFzsmUH8FR4cOnBfw">码率</th><th data-page-node-id="Nqc2Eh7WocPDqgZu3g71nI">标称帧率</th><th data-page-node-id="X1l4Oa3RdHiO1jAqBHFexD">完全重复帧</th><th data-page-node-id="4FmLhLoVjowWW8I1AHVcl4">重复帧间隔分布</th><th data-page-node-id="a0TEnYDFFBuCMZsAWdGekV">判定</th></tr></thead>
+  <tbody data-page-node-id="CDkngPMvxgUtntGof0WlDq">
+    <tr data-page-node-id="fMSB0ygbx3gUkSW2tRGHsV"><td data-page-node-id="Yt8fEcxfzA4SsSu0X1nyOd">旧素材 <code data-page-node-id="GLPEzc1CmxnUf8bXLAOxNe">20260913-130732</code></td><td data-page-node-id="QDh1bSCX3xeEHjx0e97iWJ">20069</td><td data-page-node-id="WeqW7MpAcxzTuHe5vWomfI">60</td><td class="dim" data-page-node-id="CGQbWumBjfRPME9KMbtTgL">—</td><td class="dim" data-page-node-id="LzCSBFSfvqL6ctXb7kN5UU">—</td><td data-page-node-id="3oQAX1pRJI2MnmxwKKrxnL">基准</td></tr>
+    <tr data-page-node-id="YSMDsG8CQbxkQ7IB5UIYB6"><td data-page-node-id="fzNbpdW2bd2v4u8gN8KxCl">前一版 <code data-page-node-id="7zBWv9MKVXh6cFzhAl5Syq">20-24-36.mkv</code></td><td data-page-node-id="FAF7yjuQhHdTwVETHi0AhX">18031</td><td data-page-node-id="KzOGXK0COChaBvVPYTIh2u">120</td><td data-page-node-id="cNAmlBgIqYRBImbyD1NC7C">23.3%</td><td class="bad" data-page-node-id="2xw1daw5PkEzmbb0Yx3sNg">4 帧 ×86、2 帧 ×83（固定节奏）</td><td class="bad" data-page-node-id="mecXmkAiJL2j6b9cpi4qEb">帧生成</td></tr>
+    <tr data-page-node-id="uc3WVHf1DwV8N4XDKsJ5R6"><td data-page-node-id="FGuGhzRgq27HaooXKXyTDw">本次 <code data-page-node-id="AWqaS5JkHU4GW4yAcM4IUW">20-36-47.mkv</code></td><td data-page-node-id="AXyCEvhUq92KgzJinFVlbU">23893</td><td data-page-node-id="5wSEL9ufJOdr2mgW2iqtPU">120</td><td data-page-node-id="x0YqNwtUBLMrp2G86nXZUE">13.7%</td><td class="ok" data-page-node-id="Dpbq4iPfFKwuBHwlFB6uu9">1 / 2 / 3 / 4 帧各约 20 次（无节奏）</td><td class="ok" data-page-node-id="uaP83T8mv53DDnzXpWH5hC">原生</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note" data-page-node-id="S1g1qDG8gAnaT4HoLInjcP">
+  <b data-page-node-id="9nuXBU0ZcFnUcGxQ6eGqmj">判据不是"重复帧比例"而是"重复帧的间隔分布"</b>：帧生成会以固定节奏复用旧帧
+  （前一版每 2 或 4 帧重复一次，出现 80 多次），原生帧的重复是编码器在低运动时的自然行为，间隔分散。
+  环形核区域 MAE 中位数：前一版 0.145 → 本次 0.304，逐帧变化量翻倍。
+</p>
+
+<h2 data-page-node-id="5c8eDHrUCMvTd7LgAQgsfw">2. 测量质量：信噪比提升一个数量级</h2>
+<p class="meta" data-page-node-id="ou6HkKvnZV3sF8A86DzNbt">同一套代码（边缘最陡处亮度调制 ÷ 梯度）跑三段素材，Δr = 该环半径的呼吸振幅。</p>
+<div class="wrap" data-page-node-id="Mj7uFxAQHl5O3kOqjUy0Y9">
+<table data-page-node-id="K7QV4PJXlMrs83112Leer1">
+  <thead data-page-node-id="16qiTrkkhrCGNEWXZLrN1r"><tr data-page-node-id="gqEGAWJYaMsTkRS4t39Pgn"><th data-page-node-id="pGKzGIx48eK7zJGaETg4oE">环</th><th data-page-node-id="Zsou20XhO9kWWtC5OEqEJY">旧素材 Δr(px)</th><th data-page-node-id="XGLtOqxsNx58z3OISsWihJ">本次原生 Δr(px)</th><th data-page-node-id="eDY0mUgKG4kTgiSjDKVM4g">信噪</th><th data-page-node-id="fMzxn8inX797jPnH0NJfA7">前一版(帧生成) Δr</th><th data-page-node-id="PlMAWtR7O8AYH4Gt2PQ74d">信噪</th></tr></thead>
+  <tbody data-page-node-id="WDn3Dv27pd7yrwoqXevSV4">
+    <tr data-page-node-id="EmJVr92XLoye4psh9J8fW7"><td data-page-node-id="YKKnCFkO102dRIPs9ECEFX">深眼</td><td data-page-node-id="wvTCSM06K2jB5ZuCqspt3i">6.78</td><td class="ok" data-page-node-id="JVd5pb5Hs4Cy6XORkfqqll">7.82</td><td data-page-node-id="L0eEdaAbeB7q6npworK8nn">3.6</td><td class="bad" data-page-node-id="kr6A4edRc1nKyHnlvslu1I">42.16</td><td class="bad" data-page-node-id="4A8qOAoGQPCSCtlC1VeB1j">0.1</td></tr>
+    <tr data-page-node-id="m6rPvbcmofcq375TmPQUAC"><td data-page-node-id="gW9hA7bDTSKL0aabLCyH8U">蓝瞳</td><td data-page-node-id="ttivgdp2103OfdxDtt1iod">8.94</td><td class="ok" data-page-node-id="Sx0UOJ3KABMIVdUOcJ1Cjk">9.74</td><td class="ok" data-page-node-id="fglFVbd3uEZPkAVUBwyB43">7.2</td><td class="bad" data-page-node-id="4sQi25MKQoJcwtBhak1zoh">36.99</td><td class="bad" data-page-node-id="kJRetrsO52N5a4Anlugeqt">0.2</td></tr>
+    <tr data-page-node-id="C642L2ugL0gsXPwbGSLrKX"><td data-page-node-id="R2tscgcRvT18npMU0hi1TD">灰紫蓝</td><td data-page-node-id="sNOFPl2p2q325PfifQBJbU">8.87</td><td class="ok" data-page-node-id="IRbdOXiiRbL0GrkOLtFjXE">10.57</td><td data-page-node-id="Xpbu7XmiA5o7z97EEZuIKY">5.4</td><td class="bad" data-page-node-id="2EPSU4pdovdCgvf9vsfGJt">25.54</td><td class="bad" data-page-node-id="1gw20hqo6LQkwGZWa9llLX">0.1</td></tr>
+    <tr data-page-node-id="NcX12ACfuFx8PbC9gNCmq5"><td data-page-node-id="w8mHJ54U6TGKSlFXMmL0bG">白环</td><td data-page-node-id="Znoy4mX9zgTCSL12auAIlp">9.99</td><td class="dim" data-page-node-id="i47Etrf62g85rAVvMhwRnW">4.90</td><td data-page-node-id="Ue1MlICLQMyXfHUk2RFENh">2.5</td><td class="bad" data-page-node-id="7FyfFC4VSjgUZbHDunKmsh">24.18</td><td class="bad" data-page-node-id="r1gyya5k6pTuTC1rH5qGUe">0.2</td></tr>
+    <tr data-page-node-id="WF8chH2fRtN1jzH8eA73CX"><td data-page-node-id="A8Px6sR8UcXVVbNeiBcxND">靛蓝环带</td><td data-page-node-id="mjX0m7iDBuxYfwj5f66tGD">0.53</td><td data-page-node-id="dqvWlltSyZYgMnga0E7OXJ">0.42</td><td class="dim" data-page-node-id="ANG3Nut5n8odVUHYZK92Ye">0.2</td><td class="bad" data-page-node-id="XIjA0ZxQp8wu0lAEnuCs1W">103.1</td><td class="bad" data-page-node-id="GdBzDgaE0e9HywhxWGPVGH">0.4</td></tr>
+    <tr data-page-node-id="QtqKHI6s40JAZsayI04udM"><td data-page-node-id="ymqaXPnW4utxreXgYkBhEd">外圈蓝</td><td data-page-node-id="hWHqe6Y4XPNQNB0fDHBhp4">0.015</td><td data-page-node-id="QdCrlh4SOIRsGXoT49PVTZ">1.34</td><td class="dim" data-page-node-id="puS9U8N3jhGUPJW8zlg145">0.9</td><td class="bad" data-page-node-id="0HM24ASXLC1lzrB8h85Be0">68.1</td><td class="bad" data-page-node-id="pA4ajcM9VoCtoV7fvzhKkF">0.4</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note" data-page-node-id="yAcMJuDbvN6JM2q7LQEnXN">
+  <b data-page-node-id="CPfVtWUtJjmkE7P2iC7NdL">原生素材的复测稳定性</b>：9 秒与 18 秒两次测量的 Δr 相差 1–4%（7.82→7.92、9.74→9.90、10.57→10.95、4.90→4.81），
+  相位差 &lt;3ms —— 说明这套测量在原生素材上是可重复的。深度幅度排序（深眼≈蓝瞳＞灰紫蓝＞白环）两段素材都成立。
+</p>
+
+<h2 data-page-node-id="p03zaDfsnT7rFjMYqtIsx4">3. 环间相位：这是本次最重要的结果</h2>
+<p class="meta" data-page-node-id="exzBFEg3b8fofch513sN0F">
+用"窄环带空间平均 + 单频 DFT"（<code data-page-node-id="pTnAq2QUrItmdtPd6FOt2d">scripts/_band_phase.py</code>）测相位，比单点采样稳得多。
+白环带取在边缘外侧，位移方向与内环相反，已按半周期校正。
+</p>
+<div class="wrap" data-page-node-id="HRfnmsG8zc1YZIE8kZTyaa">
+<table data-page-node-id="pQQFWYBLpjPHUy3sbX5E1F">
+  <thead data-page-node-id="lFf5k7mBqmyKoDolRdxUqP"><tr data-page-node-id="vvoHG1Do5yBW4Y5UExPOny"><th data-page-node-id="EZemfgS02CiLnMCdsZMyvn">环</th><th data-page-node-id="4qmqJBujrGfZJFplVSPjm0">旧素材相位</th><th data-page-node-id="dYVQM5NPM7KyEcbiVW7HWp">本次原生相位</th><th data-page-node-id="xOYH762mkfUbFDiwIYLSxv">跨素材差</th><th data-page-node-id="tzjeFf3m6QAdq1RI2m6AU9">顺序</th></tr></thead>
+  <tbody data-page-node-id="JEM9LyE7OGq8KE8wfS6TZp">
+    <tr data-page-node-id="yrLIfiBISoosJB00YXc4OY"><td data-page-node-id="JeFkt0ADD2Jy2PBQY4hRDj">深眼</td><td data-page-node-id="E9Ip9tgNVShxzC8kQl7k8a">−314.6 ms</td><td data-page-node-id="B4B1ZDGGpeKP1wWBoZN7OX">−349.5 ms</td><td class="dim" data-page-node-id="PDqAQ8uBBIrbb9zBgaF7oc">34.9 ms</td><td class="ok" data-page-node-id="HNYQA5hYpiuPEHBDoeIj0I">最早</td></tr>
+    <tr data-page-node-id="zsZmABrLjhUhqzs8aQ7hvD"><td data-page-node-id="ns1rItyVJc5mEQ1oEBY02i">蓝瞳</td><td data-page-node-id="V47E62QJVo29JheCKHvJT3">−367.1 ms</td><td data-page-node-id="8g5Fue41ucLdPFrgJLWrVx">−366.0 ms</td><td class="ok" data-page-node-id="n69eaANpXF1MuCSpvAqWwA">1.1 ms</td><td class="ok" data-page-node-id="RGSAEEpDx3sVUh1zvH1J4G">第 2</td></tr>
+    <tr data-page-node-id="pDNG5tEDnGefRQvNgcjprc"><td data-page-node-id="va4y0N5MHWUgHdq7781Pad">灰紫蓝</td><td data-page-node-id="0qrCxXjYmfMxZa5LALtBgb">−395.5 ms</td><td data-page-node-id="P2Cw7DJpJaSjsvNOqfAXhI">−382.5 ms</td><td class="dim" data-page-node-id="xLXYmC8OfMBHpiBEXsuJ3S">13.0 ms</td><td class="ok" data-page-node-id="7EEnIeOod4X0z9Nx7GucGW">第 3</td></tr>
+    <tr data-page-node-id="8X2EngCjQYj6tsjpfaFvei"><td data-page-node-id="XiodfjJD4snYFr13iXbSv9">白环</td><td data-page-node-id="tiCrTa31T14xsGUmTXNyeG">−429.2 ms</td><td data-page-node-id="6KhtBWJ3HR73D0vONMwYW0">−426.1 ms</td><td class="ok" data-page-node-id="DeTVefdvHsu5evsS6BZAIb">3.1 ms</td><td class="ok" data-page-node-id="YXxM38DlT3cYvXpqLNdpFF">最晚</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="meta" style="margin-top:16px" data-page-node-id="3RvwQL9vfXwDH6abJ45RmT">层间步长（相邻两环的相位间隔）：</p>
+<div class="wrap" data-page-node-id="KrlzcG5ZsT2U2WHi02ILCF">
+<table data-page-node-id="fIxYqqtDX9izbU4r9Fw7WX">
+  <thead data-page-node-id="557J8iOsd9HSCvFDsUHL41"><tr data-page-node-id="xMKyCVEF04GiREBF4ZQBNU"><th data-page-node-id="IZeZyAGX4fY9KWti32pUsX">区段</th><th data-page-node-id="ENIqxLqskj5WHzTiu07gic">旧素材</th><th data-page-node-id="qiEQ3jHXnTAYZXOind5xud">本次原生</th></tr></thead>
+  <tbody data-page-node-id="NC0kT8CsrCvw51Y6PLJec5">
+    <tr data-page-node-id="xglV5mQL9YzwXchJKfJMnk"><td data-page-node-id="haALlUZAvlLux0ygVCcyPv">深眼 → 蓝瞳</td><td data-page-node-id="TFYC7Fxw6hVNPZIZoaYdOm">52.5 ms</td><td data-page-node-id="CXlrJFO2WN78C8vKX4pQoT">16.5 ms</td></tr>
+    <tr data-page-node-id="rlgesEA4zZAe0nlPuVYeLH"><td data-page-node-id="o0fFaXEYxCD6rb4xjlqDGZ">蓝瞳 → 灰紫蓝</td><td data-page-node-id="sl1PzalFNJEo32ABjAqSfQ">28.4 ms</td><td data-page-node-id="tAYsxwMYzzdQp6aXfztJtb">16.5 ms</td></tr>
+    <tr data-page-node-id="H3Bc5tDgVcZyL3HEFmuV7x"><td data-page-node-id="cD2n0b8BTAKOAgw5BAwC8p">灰紫蓝 → 白环</td><td data-page-node-id="SGSbGaD1d0uQxbBXN0DnjE">33.7 ms</td><td data-page-node-id="Ne9FC3gS1ShGmGDPW9ssVA">43.5 ms</td></tr>
+    <tr data-page-node-id="gnHA9HrhWPFbcjydyruXVz"><td data-page-node-id="qaqAN9XYhYb3rYzcVoVTTi"><b data-page-node-id="LnR2go1dWynG85oHx1RxSx">由内向外总跨度</b></td><td data-page-node-id="idRrprFzPtDNeMqmtH07xT"><b data-page-node-id="et569Xe44S5OLXUsLjH4nS">114.6 ms</b></td><td data-page-node-id="lyBv9iBRzzto20f5ikBBYC"><b data-page-node-id="AQnLKw1VDikvHdLaCGGAad">76.5 ms</b></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note" data-page-node-id="a8YkmtST58EYwQkueOEoyW">
+  <b data-page-node-id="k8Xri5S5KSPtXxRc0fpEmL">两段素材的相位顺序完全一致</b>：深眼 → 蓝瞳 → 灰紫蓝 → 白环，由内向外依次延后，这一点被独立复现。
+  但<b data-page-node-id="DxsYhRU9vubymoftsy5aZT">步长大小不一致</b>（52.5/28.4/33.7 对 16.5/16.5/43.5），总跨度 115 ms 对 77 ms —— 平均每层约 25–40 ms。
+  <br data-page-node-id="Fu5iNZCdFkcDHjJdg60fTF">对照：lab 里现在设的是"每层固定 50 ms"，三层共 150 ms，<b data-page-node-id="nz4MpA23TG5LTfXyNzz3ts">比两段素材实测的总跨度都大</b>。
+</p>
+
+<h2 data-page-node-id="05woh8JzWRJhAhLHa00EjP">结论</h2>
+<div class="verdict" data-page-node-id="D5rdXHgGDeCcJUB4Tzy3ft">
+  <div class="vcard" data-page-node-id="AL49lW7OqfTBFcJtEHpAPp">
+    <b class="ok" data-page-node-id="mSMgwhuVD5yPk9rCiQAKoF">确认 ✅</b>
+    这次确实是原生 120fps（帧生成指纹消失）<br data-page-node-id="f1vX7zfWbObVK2ukQPXJVz">
+    尺寸：R=217.58 vs 216.77（+0.37%）<br data-page-node-id="tUj18noOvw7NGLV43SW3aG">
+    周期：1.1735 Hz vs 1.1649 Hz（差 0.7%）<br data-page-node-id="SsbLsv1oF53nRHLiKvgG6I">
+    <b data-page-node-id="89GaBaXU7RHgINTuSuEMB5">相位顺序：由内向外依次延后，两段素材一致</b><br data-page-node-id="7HE0LqTDrxNsjOe5aDiAeD">
+    幅度排序：深眼≈蓝瞳＞灰紫蓝＞白环
+  </div>
+  <div class="vcard" data-page-node-id="SQATP6YcQmnzHKqGNMvj7b">
+    <b class="bad" data-page-node-id="eVBCNbwVjjKcTHFP4afhk7">仍有不确定 ⚠️</b>
+    层间步长的具体数值（两段素材 25–40 ms 对不上）<br data-page-node-id="HBzIv7cHSoJY4LM8yiNTAK">
+    深眼相位（跨素材差 35 ms，是四个环里最大的）<br data-page-node-id="6OkBRURuvgBHJ6jfxaPIUs">
+    白环振幅（泛光把外缘抹平，Δr 只有旧素材的一半）<br data-page-node-id="B3gjjbhB6EtC7gLzpgr2DQ">
+    <span class="dim" data-page-node-id="A8Cq2AxmPqHCJDAoXzxXBp">原因仍是录屏带泛光，边缘不是陡边</span>
+  </div>
+</div>
+<p class="note" data-page-node-id="1q63WEaQbtTPnEaVCIRlXl">
+  <b data-page-node-id="JbTmUV2xgYO9Z9DdfaccvH">对当前实现的直接建议</b>：把 lab 里的"每层 50 ms"下调到 <b data-page-node-id="ZzDaiHE6HUGuItr2FqcuGA">约 30 ms</b>（三层共 90 ms），
+  落在两段素材实测区间（77–115 ms）中间；深眼再单独给一点额外超前量。
+  若要拍死这个数值，需要一次无泛光采集（游戏内截无损帧序列），现有管线可以直接给出 ±0.1% 级结果。
+</p>
+<p class="meta" style="margin-top:26px" data-page-node-id="lgLljwJsNP4iQUA7WlYFbY">
+  脚本：<code data-page-node-id="6KA7TiNaK3p9xQU9Uwvar5">scripts/_check_fps.py</code>（素材体检）· <code data-page-node-id="RyiMdKrir6HEHET0eheOTR">scripts/_calib_new.py</code> · <code data-page-node-id="sbbk6rqlKaKk1dr6Af4Pm0">scripts/_measure_v3.py</code> · <code data-page-node-id="VKShXJZ6GZ2VfilJZfesjV">scripts/_band_phase.py</code><br data-page-node-id="4ljCltBDSp2kaussTWGjWG">
+  数据：<code data-page-node-id="LwLV4Eu8ZJ8TdnjP2FqcW3">dev/align_native.json</code> · <code data-page-node-id="QxWxtWPUpyefYjovfjEZi2">dev/v3_native.json</code> · <code data-page-node-id="1UEjpm9UAJyYOxI7uWhojD">dev/v3_native18.json</code> · <code data-page-node-id="62KmAWw0hMKAMbuQ9RL1AO">dev/band_native.json</code> · <code data-page-node-id="xVp3viHhsaR39aXGPFHB2y">dev/band_old.json</code>
+</p>
+
+</body>
+</html>
