@@ -1,0 +1,16 @@
+# 项目工作区数据（本地记忆/日志，不发布）
+.workbuddy/
+
+# 大体积素材：分析中间产物 + 参考视频（>100MB 超 GitHub 单文件限制；json 实测数据已保留，脚本可重跑）
+analysis/
+reference/
+generated-images/
+dev/*.mp4
+
+# Python
+__pycache__/
+*.pyc
+
+# 系统
+Thumbs.db
+.DS_Store

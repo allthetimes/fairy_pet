@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="8CdE5SIX37NCF9pdmImUdh">
+<head data-page-node-id="LDZQwaeour2uTA5jHEL2EW">
+<meta charset="utf-8" data-page-node-id="ueYjupwu4eO5njqS9qnc8i">
+<title>Fairy 环形核 · 代码复刻实验台</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font:13px/1.6 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+  body{
+    --stage:#0a0e18; --panel:#131826; --line:#243049; --txt:#dbe3f5; --dim:#8494b6; --accent:#4b7cf3;
+    background:var(--stage); color:var(--txt);
+    display:flex;
+  }
+  body.light{--stage:#eef1f7; --panel:#fff; --line:#d6dcea; --txt:#1d2433; --dim:#66718a; --accent:#2f63e8}
+
+  /* ---------- 左：舞台 ---------- */
+  .stage{
+    flex:1; min-width:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:18px; padding:24px; position:relative;
+  }
+  .stage::before{
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+    background-size:32px 32px; pointer-events:none;
+  }
+  body.light .stage::before{background-image:linear-gradient(rgba(0,0,0,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.035) 1px,transparent 1px)}
+
+  .pet{position:relative; width:420px; height:420px; display:grid; place-items:center; cursor:pointer;
+       -webkit-user-select:none; user-select:none}
+  /* 整机浮游：作用在 HTML 容器上，CSS transform 语义正常，不涉及 SVG transform-box */
+  .float{animation:float 3.4s ease-in-out infinite; will-change:transform; transition:filter .3s}
+  @keyframes float{
+    0%,100%{transform:translateY(-4px) scale(1)}
+    50%    {transform:translateY(4px)  scale(1.012)}
+  }
+  /* 说话态：整体提亮（filter 不是 transform，无参照盒问题） */
+  .pet.talking .float{filter:brightness(1.16) saturate(1.08)}
+  .pet.clicked .float{animation:clickpunch .42s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes clickpunch{
+    0%{transform:scale(1)} 35%{transform:scale(.92)} 70%{transform:scale(1.045)} 100%{transform:scale(1)}
+  }
+  /* 故障态：RGB 分离（同样是 filter，安全） */
+  .pet.glitch .core{animation:rgbsep .3s steps(2) infinite}
+  @keyframes rgbsep{
+    0%{filter:none}
+    33%{filter:drop-shadow(-3px 0 0 rgba(255,60,60,.55)) drop-shadow(3px 0 0 rgba(60,255,220,.5))}
+    66%{filter:drop-shadow(2px 0 0 rgba(255,60,60,.4))}
+  }
+
+  /* ---------- 右：控制台 ---------- */
+  .panel{
+    width:330px; flex:none; background:var(--panel); border-left:1px solid var(--line);
+    padding:18px; overflow-y:auto; display:flex; flex-direction:column; gap:16px;
+  }
+  h1{font-size:15px; margin:0; letter-spacing:.02em}
+  h1 small{display:block; font-weight:400; color:var(--dim); font-size:11px; margin-top:3px; letter-spacing:0}
+  h2{font-size:11px; margin:0 0 8px; color:var(--dim); text-transform:uppercase; letter-spacing:.09em; font-weight:600}
+  .grp{border:1px solid var(--line); border-radius:9px; padding:12px}
+  .row{display:flex; flex-wrap:wrap; gap:6px}
+  button{font:12px/1 inherit; padding:7px 10px; border-radius:6px; cursor:pointer;
+    background:transparent; color:var(--txt); border:1px solid var(--line); transition:.13s}
+  button:hover{border-color:var(--accent); color:var(--accent)}
+  button.on{background:var(--accent); border-color:var(--accent); color:#fff}
+  label.sl{display:grid; grid-template-columns:96px 1fr 44px; align-items:center; gap:8px; margin:7px 0; font-size:12px}
+  label.sl span{color:var(--dim)}
+  label.sl b{text-align:right; font-weight:600; font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%; accent-color:var(--accent)}
+  .cmp{display:flex; gap:10px; margin-top:10px}
+  .cmp figure{margin:0; flex:1; text-align:center}
+  .cmp img,.cmp svg{width:100%; border-radius:8px; display:block}
+  .cmp figcaption{font-size:11px; color:var(--dim); margin-top:5px}
+  .note{font-size:11px; color:var(--dim); line-height:1.65}
+  code{background:rgba(127,127,127,.16); padding:1px 4px; border-radius:3px; font-size:11px}
+  .warn{font-size:11px; line-height:1.6; color:#ffd489; background:rgba(255,180,60,.09);
+        border-left:2px solid #ffb43c; padding:7px 9px; border-radius:4px}
+
+  /* ---------- 等比例对比模式 (?compare=1) ---------- */
+  .cfWrap{display:none}
+  body.compare .stage,body.compare .panel{display:none}
+  body.compare .cfWrap{display:flex; flex:1; flex-direction:column; align-items:center;
+    justify-content:center; gap:14px; padding:20px}
+  .cfRow{display:flex; gap:16px}
+  .cfTile{width:500px; height:500px; position:relative; display:grid; place-items:center;
+          overflow:hidden; border:1px solid var(--line); border-radius:10px; background:#0a0e18}
+  .cfTile img{position:absolute; width:100%; height:100%}
+  .cfTile>svg{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%)}
+  .cfCap{font-size:12px; color:var(--dim); text-align:center}
+
+  /* ---------- 裸渲染模式 (?bare=1&core=425[&freeze=N]) ---------- */
+  body.bare{background:transparent}
+  body.bare .stage,body.bare .panel,body.bare .cfWrap{display:none}
+  body.bare #svg{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%)}
+  body.bare #glowPulse{display:none}   /* 量几何时关掉泛光，避免干扰边界检测 */
+</style>
+</head>
+<body data-page-node-id="peGfKQXUlics7eM23DpFBD">
+<div class="stage" data-page-node-id="IY3B9fAiGwKRQPPc8aamGM">
+  <div class="pet" id="pet" data-page-node-id="YFm0UcWu7mPUuJhKX6keay">
+    <div class="float" data-page-node-id="h872Kn8UB1KT5tjCiOIRw0">
+      <svg id="svg" width="420" height="420" viewBox="-120 -120 240 240" data-page-node-id="hyhH3pGd0QO2vyJ9vzcvLu">
+        <defs data-page-node-id="3ElRxLHevooqvIT83thDoD">
+          <!-- 各层径向渐变：offset 按实测半径归一化，颜色按避开高光扇区的采样校准 -->
+          <radialGradient id="gOuterBlue" cx="50%" cy="50%" r="50%" data-page-node-id="D9veCLVEvotv4GggHuMzJJ">
+            <stop offset="78.1%" stop-color="#2D3DD0" data-page-node-id="o1jKX6tEEvEupyxHURnnHh"/>
+            <stop offset="84%"   stop-color="#2E3FD8" data-page-node-id="wdtWqpdD95DVDYgQyM4HwE"/>
+            <stop offset="92%"   stop-color="#3145E6" data-page-node-id="j8AFf1I6LROomOOstQpMaW"/>
+            <stop offset="100%"  stop-color="#3549EC" data-page-node-id="d4WrL01ZFWigeuuJFPzuTs"/>
+          </radialGradient>
+          <!-- 靛蓝环带+尖齿共用一条径向渐变。
+               必须用 userSpaceOnUse：path 的包围盒含尖齿(r=91.7)，
+               用 objectBoundingBox 会让渐变比例整体失准。
+               各 stop 颜色为实测：尖齿中心(213.5°)与环带中段(170°/258°)
+               在同一半径上颜色一致（色差≤13，属噪声），证明二者本是同一几何体。 -->
+          <!-- 靛蓝环带+尖齿共用一条径向渐变。
+               必须用 userSpaceOnUse：path 的包围盒含尖齿(r=91.7)，
+               用 objectBoundingBox 会让渐变比例整体失准。
+               环带可见区 62.2-78.1u (66.9-84%) 的 stops 按 2.6 视频实测重写
+               (2026-09-13 用户反馈: 白环外缘与齿轮间有一圈"白色高光"，原版没有——
+                旧值 69.4% #4E5FA6 L98 在白环外形成亮带, 原版同区 L63→42 平滑衰减;
+                8 方向 RGB: 62u(53,52,147) 64u(46,46,132) 66u(41,39,120)
+                70u(33,30,117) 74u(28,27,119) 76u(32,32,125)), 颜色 +4% 补偿扫描线;
+               84% 起为尖齿区, 维持立绘实测（尖齿与环带同一几何体） -->
+          <radialGradient id="gIndigo" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="93" data-page-node-id="yXj7YnWM9yH5XfmXZFgfAc">
+            <stop offset="66.9%" stop-color="#373699" data-page-node-id="zKp6w5agcNIdbwzplHydpb"/>
+            <stop offset="68.8%" stop-color="#303089" data-page-node-id="TKDtXhPIc2P88SONw3NdUv"/>
+            <stop offset="71.0%" stop-color="#2B297D" data-page-node-id="8gvEDbppUtjdfzCBQRleij"/>
+            <stop offset="75.3%" stop-color="#221F7A" data-page-node-id="CEx94KlbzOpvSVlkj9m7bc"/>
+            <stop offset="79.6%" stop-color="#1D1C7C" data-page-node-id="Nw52tY8uH3vB7kJ1fR6qXz"/>
+            <stop offset="81.7%" stop-color="#212182" data-page-node-id="Pv29wK5mE8xT4hN7dJ3sQa"/>
+            <stop offset="84.0%" stop-color="#212382" data-page-node-id="Kt63rZ9nW2yU5eG8cB1vMh"/>
+            <stop offset="92.5%" stop-color="#1D208A" data-page-node-id="JNIM4ghVVSZNO6ZzRvkwjF"/>
+            <stop offset="96.8%" stop-color="#1A2094" data-page-node-id="Urb42JfUWTB0JWnCX7gGXa"/>
+            <stop offset="100%"  stop-color="#17209C" data-page-node-id="UtaFskQtkoimwzPChRkaOT"/>
+          </radialGradient>
+          <radialGradient id="gWhite" cx="50%" cy="50%" r="50%" data-page-node-id="HkAtbr3UpUMzsMr91BnP5G">
+            <stop offset="69.3%" stop-color="#DEDAE3" data-page-node-id="CFD7ZnS8T0q2qHIuDavvwm"/>
+            <stop offset="100%"  stop-color="#D7D3DC" data-page-node-id="6ZGiXqpjWclkPFcE6oFMzF"/>
+          </radialGradient>
+          <radialGradient id="gSlate" cx="50%" cy="50%" r="50%" data-page-node-id="9cA33zDW2iiVSR5s7Qqdnk">
+            <stop offset="68.5%" stop-color="#848FC8" data-page-node-id="uqg1B0o7vG5IhRqYEBPeMw"/>
+            <stop offset="100%"  stop-color="#8995CB" data-page-node-id="WjObvyPDqDG6bHbWn545zh"/>
+          </radialGradient>
+          <radialGradient id="gMidBlue" cx="50%" cy="50%" r="50%" data-page-node-id="ucuvtRF4Gxaw3g0zvJGVg6">
+            <stop offset="0%"    stop-color="#2A4FA6" data-page-node-id="QNkxtGfla2qzkpWEZcdLXu"/>
+            <stop offset="70%"   stop-color="#2C57B4" data-page-node-id="Z2oyUP7vFyHQVhCTSx1XEc"/>
+            <stop offset="82%"   stop-color="#2D62C0" data-page-node-id="FQ16xVYFTM0a5Prch60gZO"/>
+            <stop offset="100%"  stop-color="#6183C6" data-page-node-id="h7U3UJkwpad0BYLQhGQduP"/>
+          </radialGradient>
+          <radialGradient id="gPupil" cx="50%" cy="50%" r="50%" data-page-node-id="FsH0Rg6DFECUAothqGqD2b">
+            <stop offset="0%"   stop-color="#2C4684" data-page-node-id="h5128POhcMUPIx7XNsxE7Y"/>
+            <stop offset="80%"  stop-color="#2D4585" data-page-node-id="muuj7Ua9t4jDMsvJ8EL6aM"/>
+            <stop offset="100%" stop-color="#2C4A8D" data-page-node-id="HzWEBX2DNaKqeZncCOY7hO"/>
+          </radialGradient>
+          <!-- 外部辉光：亮环落在核心边缘(r=100 处 = 135 的 74%) -->
+          <radialGradient id="gGlow" cx="50%" cy="50%" r="50%" data-page-node-id="kHcUDMURCV7ZOTqiU0Yjc6">
+            <stop offset="0%"   stop-color="rgba(74,126,255,0)" data-page-node-id="ZvlzRJDsj9SN9LH2H6vxam"/>
+            <stop offset="64%"  stop-color="rgba(62,110,255,.10)" data-page-node-id="HFSAqDWMljH9C8Hb1LROzn"/>
+            <stop offset="74%"  stop-color="rgba(92,146,255,.62)" data-page-node-id="JfH29QxYT9bi19vqKNwW4F"/>
+            <stop offset="84%"  stop-color="rgba(74,126,255,.26)" data-page-node-id="K8E4hETBVI07hPr9u2QoVd"/>
+            <stop offset="100%" stop-color="rgba(74,126,255,0)" data-page-node-id="HwjIx5N2kL18ABin09AWtB"/>
+          </radialGradient>
+          <radialGradient id="gGlint" cx="50%" cy="50%" r="50%" data-page-node-id="20fIB3XNPHc0bwdIqDTZnR">
+            <!-- 2026-09-13 霍夫拟合实测: 实心锐边圆盘 r≈14.1u, 无渐变尾(角向平均假象), 仅留0.5u抗锯齿羽化 -->
+            <stop offset="0%"   stop-color="#DBDBEB" data-page-node-id="p6fq1DBFUe132uFrPyEBXv"/>
+            <stop offset="96%"  stop-color="#DBDBEB" data-page-node-id="Zy7rCVlOaRjaP8yhxy09IG"/>
+            <stop offset="100%" stop-color="#DBDBEB" stop-opacity="0" data-page-node-id="eHpkT218UiX1BYiUqPKerV"/>
+          </radialGradient>
+          <pattern id="scanlines" width="4" height="2.2" patternUnits="userSpaceOnUse" data-page-node-id="y3khxd4bpSFhgDjBueO6Cl">
+            <rect width="4" height="1.1" fill="#000" opacity=".105" data-page-node-id="lxBlwuIZybCVOApQ27z9Rp"/>
+          </pattern>
+          <clipPath id="clipCore" data-page-node-id="Sb188hWMLAAFQyGy19bwkA"><circle r="100" data-page-node-id="aOXhX8oL2Rs2zsJ9tHjHK5"/></clipPath>
+          <!-- 上眼睑填充色: 与靛蓝层同色系 #1E2080, 外圈饱和度更高一点 -->
+          <radialGradient id="gLid" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="100" data-page-node-id="Yg6r5kLpN8fR2xLr3J7m9Z">
+            <stop offset="0%"    stop-color="#1B1F88" data-page-node-id="bOqT2c3L1yHpYrF4dJ6v0R"/>
+            <stop offset="80%"   stop-color="#1E2080" data-page-node-id="cKnX5m8W3zPt9yLq2H4dF7"/>
+            <stop offset="100%"  stop-color="#17209C" data-page-node-id="dWjR7q1L6kFs2nBv8M3xYp"/>
+          </radialGradient>
+        </defs>
+
+        <!-- 外部辉光：SMIL 缩放，恒绕用户坐标原点 (0,0) = 圆心 -->
+        <g id="glowPulse" data-page-node-id="GRUELBfzp6tBhA8QjGua8y">
+          <animateTransform attributeName="transform" type="scale"
+                            values="0.965;1.045;0.965" dur="2.4s" repeatCount="indefinite" data-page-node-id="MhXeA5BPFez5zALszyCUlB"/>
+          <animate attributeName="opacity" values=".72;1;.72" dur="2.4s" repeatCount="indefinite" data-page-node-id="74IU0BBB4GYqo1beTQOYW6"/>
+          <circle r="135" fill="url(#gGlow)" style="mix-blend-mode:screen" data-page-node-id="6sMHCiaLrJvd2em1W2nTHP"/>
+          <circle r="118" fill="url(#gGlow)" style="mix-blend-mode:screen" opacity=".55" data-page-node-id="1Q3oTR73d03kYTo8GsyxgW"/>
+        </g>
+
+        <g class="core" data-page-node-id="ibnFXffqYjtMdC7PLev3OG">
+         <!-- 呼吸系统重构 (2026-09-13 用户反馈):
+              实测 (BV1J9R2BNEpU 320s, 45帧15fps逐环追踪):
+              - 最外层(外圈蓝+靛蓝环带+尖齿+细白描边) 不动 (极差 0.18%)
+              - 从白环开始往里呼吸, 幅度从内到外递减, 同相位:
+                  深眼 ±9.9% > 蓝瞳 ±6.7% > 灰紫蓝 ±5.5% > 白环 ±4.1%
+              - 每个环独立呼吸, 这就是"灵动感"的来源
+              - spline 缓动: 顶峰停顿 + 顺滑过渡
+              外圈不再包裹在 corePulse 缩放里 -->
+         <g id="corePulse" data-page-node-id="dUeEG6Cy1ApbHCKhQgqN7e">
+
+          <!-- 由外向内嵌套（画家算法）：后画的覆盖中心，自然形成环带 -->
+          <circle id="lyOuter" r="100" fill="url(#gOuterBlue)" data-page-node-id="7lJJ1HUB1yF9Mzt7pWHc4l"/>
+
+          <!-- 靛蓝环带 + 四个角：同一个 path、同一条径向渐变 —— 二者本是一体。
+               这样尖齿与环带之间没有接缝、渐变连续，旋转时也是整个形状一起转。
+               外圈不动, 只旋转不缩放 -->
+          <g id="gearSpin" data-page-node-id="xT1Gq18qaLiom6tdRIKLlp">
+            <animateTransform id="gearSpinAnim" attributeName="transform" type="rotate"
+                              from="0" to="360" dur="12s" repeatCount="indefinite" data-page-node-id="DD7H2pMBTG0Ffis4JqR03R"/>
+            <path id="indigoShape" fill="url(#gIndigo)" data-page-node-id="9cd4tzVpRZcXeBrz4igJC4"/>
+          </g>
+
+          <!-- 白环: 独立呼吸 ±4.1% -->
+          <g id="whitePulse" data-page-node-id="whPul1qQkL2vXyP8mJ3cR4">
+            <animateTransform id="whitePulseAnim" attributeName="transform" type="scale"
+                              values="1;1;0.959;0.959;1"
+                              keyTimes="0;0.3;0.5;0.8;1"
+                              calcMode="spline"
+                              keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                              dur="0.7s" repeatCount="indefinite" data-page-node-id="whPul2qQkL2vXyP8mJ3cR5"/>
+            <circle id="lyWhite" r="62.2" fill="url(#gWhite)" data-page-node-id="NznVBFjFU6TcF3rDGMUQmN"/>
+          </g>
+
+          <!-- 灰紫蓝环: 独立呼吸 ±5.5% -->
+          <g id="slatePulse" data-page-node-id="slPul1qQkL2vXyP8mJ3cR6">
+            <animateTransform id="slatePulseAnim" attributeName="transform" type="scale"
+                              values="1;1;0.945;0.945;1"
+                              keyTimes="0;0.3;0.5;0.8;1"
+                              calcMode="spline"
+                              keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                              dur="0.7s" repeatCount="indefinite" data-page-node-id="slPul2qQkL2vXyP8mJ3cR7"/>
+            <circle id="lySlate" r="41.5" fill="url(#gSlate)" data-page-node-id="TDyxsddusjf5nYkka6PYrl"/>
+          </g>
+
+          <!-- 蓝瞳: 独立呼吸 ±6.7% -->
+          <g id="midPulse" data-page-node-id="miPul1qQkL2vXyP8mJ3cR8">
+            <animateTransform id="midPulseAnim" attributeName="transform" type="scale"
+                              values="1;1;0.933;0.933;1"
+                              keyTimes="0;0.3;0.5;0.8;1"
+                              calcMode="spline"
+                              keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                              dur="0.7s" repeatCount="indefinite" data-page-node-id="miPul2qQkL2vXyP8mJ3cR9"/>
+            <circle id="irisMid" r="28.1" fill="url(#gMidBlue)"
+                    stroke="#F4F6FF" stroke-width="0.7" stroke-opacity="0.85" data-page-node-id="LcHn49fcU93HGbxeQMGux0"/>
+            <!-- 白描边直接做成圆自身的 stroke (用户 2026-09-13 反馈: "把白边和这些圆弄成一个整体")：
+                 同一元素 => 滑条调 r、呼吸缩放、任何变换都天然整体跟随 -->
+          </g>
+
+          <!-- 深眼: 独立呼吸 ±9.9% (幅度最大, 灵动感核心) -->
+          <g id="pupilPulse" data-page-node-id="puPul1qQkL2vXyP8mJ3cRa">
+            <animateTransform id="pupilPulseAnim" attributeName="transform" type="scale"
+                              values="1;1;0.901;0.901;1"
+                              keyTimes="0;0.3;0.5;0.8;1"
+                              calcMode="spline"
+                              keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                              dur="0.7s" repeatCount="indefinite" data-page-node-id="puPul2qQkL2vXyP8mJ3cRb"/>
+            <circle id="irisPupil" r="19.9" fill="url(#gPupil)"
+                    stroke="#F4F6FF" stroke-width="0.6" stroke-opacity="0.8" data-page-node-id="FDTZC9JmkBpxEmVuqRDdRf"/>
+          </g>
+
+          <!-- 中央高光球 (2026-09-13 全部按 60fps 实测重做):
+               尺寸恒定 (与呼吸零相关, ±1%), 不再跟蓝瞳缩放;
+               位置随呼吸小幅摆动 ±(0.3,0.6)u (呼吸锁相, 谷相位=0) -->
+          <g id="glintPulse" data-page-node-id="glPul1qQkL2vXyP8mJ3cRc">
+            <g id="glintG" data-page-node-id="oE0qX304rCNEGHA4VRCDfg">
+              <animateTransform id="glintSwayAnim" attributeName="transform" type="translate"
+                                values="-0.12 -0.32;-0.03 -0.16;0.08 0.13;0.14 0.32;0.15 0.33;0.15 0.32;0.08 0.11;-0.1 -0.31;-0.38 -0.85;-0.38 -0.74;-0.21 -0.48;-0.12 -0.32"
+                                keyTimes="0;0.05;0.15;0.25;0.35;0.45;0.55;0.65;0.75;0.85;0.95;1"
+                                calcMode="spline"
+                                keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"
+                                dur="0.867s" repeatCount="indefinite" data-page-node-id="kcbEYtCGlG9V1MMTfjXbCI"/>
+              <circle cx="20.2" cy="27.2" r="14.1" fill="url(#gGlint)" data-page-node-id="pS8jeSgUcQ2VHJ5kIFXse2"/>
+            </g>
+          </g>
+
+          <!-- B 状态: 长闭眼态的眼睑底弧 (跟随白环呼吸 ±4%)
+               用户 2026-09-13 反馈: "不是整体的放大, 只是下面随着变化" -->
+          <g id="stateB_lid_bot" style="display:none" data-page-node-id="L0dBotV2qP9cR1kJ">
+            <path d="M 78.1 0 A 200 200 0 0 1 -78.1 0" fill="url(#gLid)" data-page-node-id="p1H2c4L8dF5xR9mN7qJ3sT"/>
+          </g>
+
+          <!-- C 状态: 真眨眼的眼皮底弧 (与 B 同, 瞬时 1.07s) -->
+          <g id="stateC_lid_bot" opacity="0" style="display:none" data-page-node-id="C1dBotV2qP9cR2kK">
+            <animateTransform id="blinkLidBotAnim" attributeName="transform" type="translate"
+                              values="0 -140; 0 0; 0 -140"
+                              keyTimes="0; 0.31; 1"
+                              dur="1.07s" begin="indefinite" fill="remove"
+                              data-page-node-id="a1n2I3m4T5r6a7n8s9f0o1r2m"/>
+            <path d="M 78.1 0 A 200 200 0 0 1 -78.1 0" fill="url(#gLid)" data-page-node-id="p2H3c4L8dF5xR9mN7qJ4sU"/>
+          </g>
+
+          <!-- 表面扫描线：SMIL 平移，位移量 = 图案周期，无缝滚动 -->
+          <g id="scanWrap" clip-path="url(#clipCore)" opacity=".62" data-page-node-id="bej9WSpA7LxnY3rAJG2tFj">
+            <g id="scanG" data-page-node-id="IEzihAj8O4EaaMBFAcsDXH">
+              <animateTransform id="scanAnim" attributeName="transform" type="translate"
+                                from="0 0" to="0 2.2" dur=".5s" repeatCount="indefinite" data-page-node-id="PGW81qHKpteIksOjdOgr0h"/>
+              <rect x="-120" y="-120" width="240" height="240" fill="url(#scanlines)" data-page-node-id="V1m8O2GAja5ZD66INC9vgS"/>
+            </g>
+          </g>
+
+          <!-- 最外细白描边 (不动) -->
+          <circle r="100" fill="none" stroke="#BCC4F2" stroke-width="2.3" opacity=".85" data-page-node-id="gDXnfWOTEDhoylweM60D1z"/>
+
+          <!-- B 状态: 长闭眼态的眼睑顶弧 (固定不动) -->
+          <g id="stateB_lid_top" style="display:none" data-page-node-id="L0dTopV2qP9cR1kJ">
+            <path d="M -78.1 0 A 78.1 78.1 0 0 1 78.1 0 L -78.1 0 Z" fill="url(#gLid)" data-page-node-id="p1H2c4L8dF5xR9mN7qJ3sT"/>
+          </g>
+
+          <!-- C 状态: 真眨眼眼皮顶弧 (与 B 同位置, 瞬时动画) -->
+          <g id="stateC_lid_top" opacity="0" style="display:none" data-page-node-id="C1dTopV2qP9cR2kK">
+            <animateTransform id="blinkLidTopAnim" attributeName="transform" type="translate"
+                              values="0 -140; 0 0; 0 -140"
+                              keyTimes="0; 0.31; 1"
+                              dur="1.07s" begin="indefinite" fill="remove"
+                              data-page-node-id="a1n2I3m4T5r6a7n8s9f0o1r2m"/>
+            <path d="M -78.1 0 A 78.1 78.1 0 0 1 78.1 0 L -78.1 0 Z" fill="url(#gLid)" data-page-node-id="p2H3c4L8dF5xR9mN7qJ4sU"/>
+          </g>
+         </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div class="note" style="text-align:center;max-width:420px" data-page-node-id="BGXucKLksBRERsUAWLJMF0">
+    点击试交互 · 双击眨眼 · 右键菜单在正式版里
+  </div>
+</div>
+
+<div class="panel" data-page-node-id="6yUdNrrGXAfJnw6hwP8E5e">
+  <h1 data-page-node-id="q3K59FRl8bgxelIMwhv7RO">Fairy 环形核 · 代码复刻
+    <small data-page-node-id="oJnldCmbb4M5CjEmlNgn7r">几何取自官方立绘实测（NPC_Fairy.png，2.6 版后形象）</small>
+  </h1>
+
+  <div class="warn" data-page-node-id="QP3s8F9BThbOjD6wVpWWmq">
+    <b data-page-node-id="TreCbtlNr97r7CVJwhN87f">动画已改用 SVG 原生 SMIL。</b>此前用 CSS <code data-page-node-id="PsiR0h8I12HaE3qVSAhB4d">transform-origin</code> 驱动 SVG <code data-page-node-id="2wtZc3Sk9EjxVW1knuuwof">&lt;g&gt;</code>，
+    参照盒解析错误，齿轮实际绕 viewBox 外的点旋转 —— 转 90° 后四个角会整个飞出画面。
+    SMIL 的 rotate/scale 恒以用户坐标 <code data-page-node-id="kWQXNOkS72pK6BVsgnZpTw">(0,0)</code> 为基准，从根上避开这个坑。
+  </div>
+
+  <div class="grp" data-page-node-id="siue4kZraWDCTbc6cCdZkf">
+    <h2 data-page-node-id="noWMVrxAMtNcxLdbCEIaeo">状态</h2>
+    <div class="row" id="states" data-page-node-id="DT56ImpCBRhkuH45iGeUA1">
+      <button data-st="idle" class="on" data-page-node-id="jHCtn2HQRqRVtOf2CeK0It">待机</button>
+      <button data-st="talking" data-page-node-id="SGjWQujHpVHh5zissZzmgj">说话</button>
+      <button data-st="closed" data-page-node-id="BnCL0sEdW5mNxV2qP9cR3kL">闭眼</button>
+      <button data-st="blink" data-page-node-id="ZHbXrBM0Hg3QOZxdK0VWfF">眨眼</button>
+      <button data-st="glitch" data-page-node-id="2qcH4bUM4pVHqKV9dcmeSU">故障</button>
+    </div>
+  </div>
+
+  <div class="grp" data-page-node-id="N4PA8TTI0A8RKrfF1nvfTg">
+    <h2 data-page-node-id="7xCIhYyDqBxJo2ewyMs00R">动效开关</h2>
+    <div class="row" data-page-node-id="0qrVbR1XqLyn8wFu8PlYME">
+      <button id="toggleGear" class="on" data-page-node-id="vi7DxqqeDQnRawCClRyh1E">齿轮旋转</button>
+      <button id="toggleScan" class="on" data-page-node-id="jUqXkkVtaHdPAypd1VfNO6">扫描线</button>
+      <button id="toggleGlint" class="on" data-page-node-id="JzVJufiRafLdTzIxXFoUX6">高光漂移</button>
+    </div>
+    <div class="note" style="margin-top:8px" data-page-node-id="eVVwD34m8rinfX8pqIBzhT">
+      <b data-page-node-id="jSiNvBlRa39FBdha3UwKJb">逐环呼吸（实测）</b>：外圈不动；从白环开始往里呼吸，幅度从内到外递减——
+      深眼 ±9.9% &gt; 蓝瞳 ±6.0% &gt; 灰紫蓝 ±5.5% &gt; 白环 ±4.1%，内环超前 ~0.031s/环，周期 0.867s（60fps 实录）。<br data-page-node-id="0tQMpqiaywrc8HYuRYlE7e">
+      靛蓝环带与四个角是<b data-page-node-id="TfJCGZxxjCTbu0L58yzbJ9">同一个 path</b>，整块绕圆心旋转（这才是真正的"齿轮"）。
+      官方设计本身是静态的——四个角固定于 33.5°+90k°，可随时关掉回到与立绘完全一致的状态。<br data-page-node-id="f0tOx7NLPhaXWIedpkD8Pk">
+      注意：四个角是 90° 等分的，所以<b data-page-node-id="WSQhhKmf81S3QUsigA9WcI">视觉周期只有设定周期的 1/4</b>（默认 18s/圈 ≈ 4.5s 一轮，60fps 实录转速 19.86°/s 顺时针）。
+    </div>
+  </div>
+
+  <div class="grp" data-page-node-id="4Hut21nL60Sy42PaEIoXtG">
+    <h2 data-page-node-id="htqqgIxbcwULLBldaCrk7e">底色</h2>
+    <div class="row" data-page-node-id="K0HnOYHsElBx6aSgPMDHiU">
+      <button id="bgDark" class="on" data-page-node-id="gSlODkL8v6ARAFDWHlcCSp">深色桌面</button>
+      <button id="bgLight" data-page-node-id="B70VYkAW8AVlbAufmsHcoe">浅色桌面</button>
+    </div>
+  </div>
+
+  <div class="grp" data-page-node-id="8o6rs7KeEvUAocF0HNpAlI">
+    <h2 data-page-node-id="8RYTsgi6m81NvamRl7lUbf">微调（校准用）</h2>
+    <label class="sl" data-page-node-id="39BDs0NPlta3NIYQXYG8Cz"><span data-page-node-id="h6trtoI6X02fwif0YGB9qc">外圈蓝外缘</span><input type="range" id="pR" min="96" max="104" step="0.5" value="100" data-page-node-id="uvbL5SK716rPOsN0XV8vZg"><b id="vR" data-page-node-id="zMmMj4qzB8V8DASuE2rZ6l">100</b></label>
+    <label class="sl" data-page-node-id="GQLjUXLRp2CKRiz1Z3X0P7"><span data-page-node-id="ejeHqiYWxZkTM61d44qa7H">靛蓝环带外缘</span><input type="range" id="pInd" min="70" max="86" step="0.5" value="78.1" data-page-node-id="h5Eh99CmqhfTXeVgSB5cUf"><b id="vInd" data-page-node-id="ljpJh80yQ5mnVEc52yIqLJ">78.1</b></label>
+    <label class="sl" data-page-node-id="GCZPy0ujTaDkrnCdq3V9kD"><span data-page-node-id="ScqNyiRiNSyERt2D7H9AA1">白环外缘</span><input type="range" id="pWhite" min="56" max="74" step="0.1" value="62.2" data-page-node-id="9DmdchNf2b6mxE8lFbrXkP"><b id="vWhite" data-page-node-id="swwiZFALrUzGA1TIJnqrPN">62.2</b></label>
+    <label class="sl" data-page-node-id="jEnOtY23m2GRY7OE1UpKmq"><span data-page-node-id="LNVHGZgNaHHJHFMnNrXakZ">白环内缘</span><input type="range" id="pWhIn" min="38" max="52" step="0.5" value="41.5" data-page-node-id="CcG73rm28IFWQYDFrJyqrs"><b id="vWhIn" data-page-node-id="l2YzMuApO36vjHA8t6bLPO">41.5</b></label>
+    <label class="sl" data-page-node-id="p4fXKNjVMGmsX1wU8nmmRI"><span data-page-node-id="L1Bo91UGDOCiQmXhT8hQIZ">虹膜半径</span><input type="range" id="pIris" min="12" max="34" step="0.1" value="19.9" data-page-node-id="HarL6awP9AvDhKKZWPXBDJ"><b id="vIris" data-page-node-id="YwH39x0QdW0RPIORhKW4UM">19.9</b></label>
+    <label class="sl" data-page-node-id="Ga223bFVMn1mAlRXCm3CDz"><span data-page-node-id="uQ7sN8P99UzS0aFOPEOwi0">尖齿顶端半径</span><input type="range" id="pTip" min="80" max="99" step="0.5" value="93.0" data-page-node-id="biyaXtj1A4f96WYFARC1vw"><b id="vTip" data-page-node-id="mzD82ZroEBIO2Qmzs5wQ6Q">93.0</b></label>
+    <label class="sl" data-page-node-id="wX6na5ExDhTx8Sh4xFWHeV"><span data-page-node-id="hQQUud6KcXYBDtFpnheoPl">尖齿基底半角°</span><input type="range" id="pHalf" min="4" max="20" step="0.5" value="12.5" data-page-node-id="cfysTJYhw4EVRDB22ZIE05"><b id="vHalf" data-page-node-id="wh3ARR3T3ie0cvE0UU5bNc">12.5</b></label>
+    <label class="sl" data-page-node-id="znVIwWFfERwC51pg6CaiVO"><span data-page-node-id="BfDgtUAHzgzq7Wj5Chpgd6">高光半径</span><input type="range" id="pGlint" min="8" max="20" step="0.1" value="14.1" data-page-node-id="GaA18Pd7H3ETMio063Vc1C"><b id="vGlint" data-page-node-id="TmxkF6YWt4fEAfEwnxp5J1">14.1</b></label>
+    <label class="sl" data-page-node-id="knLC1ZXNp5MGsQuTwC5uJL"><span data-page-node-id="7BIHh5NSGRIJPHxaRFkJjy">扫描线周期</span><input type="range" id="pScan" min="1.2" max="6" step="0.1" value="2.2" data-page-node-id="zPz7DzZpuLB7TVVnY0O1mK"><b id="vScan" data-page-node-id="dOyvJbJYfchWp8EWtFEQiZ">2.2</b></label>
+    <label class="sl" data-page-node-id="kGT9zc5shEWERsP0D87OI5"><span data-page-node-id="PirbPOQuG8G5Uv9lm2GG6z">齿轮周期 s</span><input type="range" id="pGear" min="6" max="24" step="0.01" value="18.13" data-page-node-id="k1Ewh6zA7DUkYHEsYRkiuS"><b id="vGear" data-page-node-id="P1cDNyU6dchNh97ZMKGgQ2">18</b></label>
+    <label class="sl" data-page-node-id="1nccysOq2fkin9fuX3qoJr"><span data-page-node-id="CsWTE8YomCNRSYuPd1GtMU">呼吸周期 s</span><input type="range" id="pBreath" min="0.3" max="3" step="0.001" value="0.867" data-page-node-id="0ZqhG5mVDoXjltkRfqjGFZ"><b id="vBreath" data-page-node-id="rK3FRj0I9n2o5awtNJ6TuU">0.87</b></label>
+    <label class="sl" data-page-node-id="xCh11HBBa5FEfKrpTcW5cZ"><span data-page-node-id="vj5Srz5fzWwFzZUYaHk7h1">呼吸强度 %</span><input type="range" id="pBreathStr" min="0" max="200" step="5" value="100" data-page-node-id="ofGPNmh3eceg8gFe4xys29"><b id="vBreathStr" data-page-node-id="gpaHfaG4UTj6EHWU7INHsY">100</b></label>
+  </div>
+
+  <div class="grp" data-page-node-id="68F7dNgqW4Es9AfSKX4WVn">
+    <h2 data-page-node-id="dsngMxIt8LDboDv7zzYFdD">与官方立绘对比</h2>
+    <div class="cmp" data-page-node-id="Lg4BPCxqy66zDIDmjHcoqM">
+      <figure data-page-node-id="O8YL6jRBuK2vTOftSGW3s7"><div id="mini" data-page-node-id="g1Fpwm5qgmUxjUQTCWqEAy"></div><figcaption data-page-node-id="zwuwrbsk8HOBAR9wL5qYHo">代码复刻</figcaption></figure>
+      <figure data-page-node-id="hcARr9SIWYzOJ9DXC4h7s1"><img src="../reference/fairy_2.6.png" alt="官方立绘" data-page-node-id="2TnKO3bOLhPjnHHRlMoHA4"><figcaption data-page-node-id="RbUaA5kVH4Ah5s3dLATgjX">官方 2.6 立绘</figcaption></figure>
+    </div>
+    <div class="note" style="margin-top:8px" data-page-node-id="srEKLjrSztfI4pCBglgZFG">
+      官方立绘里 Fairy 叠在 HDD 屏的蓝色扫描纹理上，且带屏幕泛光；代码版是纯透明底，只看圆盘本身。
+    </div>
+  </div>
+
+  <div class="grp" data-page-node-id="OmOeX1EsfBkxYP9l2h1cAT">
+    <h2 data-page-node-id="2EwK4YqqglBu3wCCY1RJ0D">实测参数</h2>
+    <div class="note" data-page-node-id="jslaok8H4z4AMTdG1VqZc5">
+      圆心 <code data-page-node-id="kyE0zrh7jPUjXNlBtyHgdP">(257.5, 254)</code> · 外径 <code data-page-node-id="oXIp5Xuqk3vFJc1jiCoTQB">212.5px</code><br data-page-node-id="6beAlyGr7MntM5rDoFfmOp">
+      环半径 <code data-page-node-id="NPJv5hQVloGKcJm9GuEIVd">43 / 65 / 95 / 137 / 166 / 212.5</code><br data-page-node-id="Ah2DuGO4sM5OfajoCBGalX">
+      四个角 <code data-page-node-id="e1x7yNhFFmFfLPBbbRjrqt">33.5° / 123.5° / 213.5° / 303.5°</code>（严格 90° 间距）<br data-page-node-id="NE2z3EzZfsD3UF5kZWhAHW">
+      尖齿 顶端 <code data-page-node-id="sHAD5j3qmoVQRfYUjIdXIr">r≈198</code> · 基底 <code data-page-node-id="sETH20z5U4nDc4d6OHF8Cf">r=166</code> · 基底半角 <code data-page-node-id="HMs2jtFr4ZPjGvjerIk8ue">12.5°</code><br data-page-node-id="xtkTnLRO4ErmuW3hMuzE5v">
+      <span style="opacity:.75" data-page-node-id="0IeCizA7rjEB12qjKP8aoG">尖齿为线性收敛真尖点；参数由扫参拟合官方轮廓（误差 0.14°）</span><br data-page-node-id="yTjgA4hUJN9Ls7B8Ge7UP8">
+      高光球 霍夫拟合 <code data-page-node-id="HkEixXjHumHAfsHy7EmgVC">盘心 (+20.2, +27.2)u · 半径 14.1u（60fps 实录）</code> 实心锐边不透明 #DBDBEB · 呼吸摆动 ±(0.3,0.6)u<br data-page-node-id="3YxVe2hOqtaU9V3Ij9bRwy">
+      呼吸脉冲 <code data-page-node-id="IaSkTzWNuIgjpkGZHke6Dl">0.867s · 相位差 ~0.031s/环 · 齿轮 18.13s/圈（60fps 实录）</code><br data-page-node-id="CCnbuOVTabuLwaOhKuiEdz">
+      实录环半径 u <code>19.9 / 28.1 / 41.5 / 62.2</code>（原立绘 21.5 / 30.6 / 44.7 / 64.5，已按实录修正）<br>
+      <span style="opacity:.75" data-page-node-id="8RU36yfLfkn5jQfxmEB6gV">（脉冲参数实测自 1080p 游戏实录 98–101.5s 区间）</span><br data-page-node-id="lCNH0pfUImhk9ky4Bsrgk9">
+      平均绝对亮度差 <code data-page-node-id="kYV5FTHoCf1ZFtA2oAf3qr">3.13 / 255</code>
+    </div>
+  </div>
+</div>
+
+<div class="cfWrap" id="cfWrap" data-page-node-id="7TgEuBEuAu4w2fyGQrwEW6">
+  <div class="cfRow" data-page-node-id="wPCA7t3siFd131o2JYNIl4">
+    <div data-page-node-id="JOHwKTHFrEpkhKkpL71NPh">
+      <div class="cfTile" id="cfMine" data-page-node-id="yCA2i4IwttV7G4KznT7tya"></div>
+      <div class="cfCap" data-page-node-id="estKCHTPs8G8BeY5cmVlhC">代码复刻（几何取自实测，齿轮已归零）</div>
+    </div>
+    <div data-page-node-id="V9eqwxhtnLKxOnPJBDxlw4">
+      <div class="cfTile" data-page-node-id="IPYefwXevDHZM6OWaVH4S8"><img src="../reference/fairy_2.6.png" alt="官方立绘" data-page-node-id="z6sFnj0mE78v2tEKIGfybp"></div>
+      <div class="cfCap" data-page-node-id="wmGVBcDlv5x2Ax2caF6D3u">官方 2.6 立绘（同一裁切比例 500px 框）</div>
+    </div>
+    <div data-page-node-id="XM25ItAEGD5MFzwsqRjvFm">
+      <div class="cfTile" id="cfDiff" data-page-node-id="7vAXnq7lgmXhE7JKzmETVP"><img src="../reference/fairy_2.6.png" alt="差异叠加" data-page-node-id="xmMD4PNKb7khCSBfeXWq3r"></div>
+      <div class="cfCap" data-page-node-id="lvIyuLoXecM6v7cZsGOdoG">差异叠加（对齐处近黑；残余亮边为抗锯齿差异）</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   几何常量 —— 全部来自 concept/visual-spec.md 的实测值
+   SVG 坐标系：viewBox="-120 -120 240 240"，核心半径 R=100
+   ============================================================ */
+const NOTCH_ANGLE = [33.5, 123.5, 213.5, 303.5];   // 实测（图像坐标，0°=右，顺时针）
+/* 靛蓝环带外缘 / 尖齿顶端 / 尖齿基底半角 —— 全部实测。
+   形状是"线性收敛到 0"的真尖点（不是梯形）。参数由扫参拟合官方轮廓确定：
+   用色系边界（靛蓝→亮蓝）逐半径量半宽，比较实测轮廓，误差从 0.97° 降到 0.14°：
+     官方      u=.79→10.25  .82→7.38  .85→4.75  .88→2.50  .90→1.12  .91→0.50  尖端 0.916
+     本实现    u=.79→10.38  .82→7.50  .85→4.75  .88→2.62  .90→1.12  .91→0.38  尖端 0.918
+   扫参钩子：?half=..&tip=.. */
+const P = { base: 78.1, tip: 93.0, half: 12.5 };
+
+/* ============ 1. 生成靛蓝层：环带 + 四根尖齿，合成单一 path ============ */
+function buildIndigo(){
+  const R = P.base, T = P.tip, H = P.half, A = NOTCH_ANGLE, n = A.length;
+  const pt = (r, deg) => {
+    const t = deg * Math.PI / 180;
+    return `${(r * Math.cos(t)).toFixed(2)} ${(r * Math.sin(t)).toFixed(2)}`;
+  };
+  // 从第一个尖齿的尖端出发，顺时针走：回齿基 → 沿圆弧到下一齿 → 冲到下一齿尖端
+  let d = `M ${pt(T, A[0])}`;
+  for (let i = 0; i < n; i++){
+    const a = A[i];
+    const nextAbs = (i === n - 1) ? A[0] + 360 : A[i + 1];   // 最后一齿绕回第一齿
+    d += ` L ${pt(R, a + H)}`;                                // 尖端 → 本齿右侧基底
+    d += ` A ${R} ${R} 0 0 1 ${pt(R, nextAbs - H)}`;          // 沿环带弧 → 下一齿左侧基底
+    d += ` L ${pt(T, nextAbs)}`;                              // → 下一齿尖端
+  }
+  document.getElementById('indigoShape').setAttribute('d', d + ' Z');
+}
+
+const svg = document.getElementById('svg');
+
+/* ============ 2. 参数绑定 ============ */
+function bind(id, labelId, apply, fmt = v => v.toFixed(1)){
+  const el = document.getElementById(id), lb = document.getElementById(labelId);
+  const run = () => { lb.textContent = fmt(+el.value); apply(+el.value); };
+  el.addEventListener('input', run); run();
+}
+bind('pR',     'vR',     v => document.getElementById('lyOuter').setAttribute('r', v));
+bind('pInd',   'vInd',   v => { P.base = v; buildIndigo(); });
+bind('pWhite', 'vWhite', v => document.getElementById('lyWhite').setAttribute('r', v));
+bind('pWhIn',  'vWhIn',  v => document.getElementById('lySlate').setAttribute('r', v));
+/* 高光位置联动 (用户 2026-09-13 反馈: "白色的大圆的周围高光也没跟着圆一起运动"):
+   实测锚点: 高光盘心 (20.2,27.2), 中心距 34.3u ≈ 深眼 19.9 + 间隙 14.4;
+   调深眼半径时高光沿原版方向滑动, 高光内缘与深眼边缘的相对关系保持不变;
+   呼吸不联动 — 60fps 全片追踪: 高光与呼吸零相关(±1%), 原版高光不随呼吸缩放 */
+function updateGlint(rp){
+  const d = rp + 14.4;
+  const c = document.querySelector('#glintG > circle');
+  c.setAttribute('cx', (20.2/34.3*d).toFixed(2));
+  c.setAttribute('cy', (27.2/34.3*d).toFixed(2));
+}
+bind('pIris',  'vIris',  v => { document.getElementById('irisPupil').setAttribute('r', v); updateGlint(v); });
+bind('pTip',   'vTip',   v => { P.tip = v; buildIndigo(); });
+bind('pHalf',  'vHalf',  v => { P.half = v; buildIndigo(); });
+bind('pGlint', 'vGlint', v => document.querySelector('#glintG > circle').setAttribute('r', v));
+bind('pScan',  'vScan',  v => {
+  const pat = document.getElementById('scanlines');
+  pat.setAttribute('height', v);
+  pat.firstElementChild.setAttribute('height', (v / 2).toFixed(2));
+  document.getElementById('scanAnim').setAttribute('to', `0 ${v}`);   // 位移 = 图案周期 → 无缝
+});
+bind('pGear',  'vGear',  v => {
+  document.getElementById('gearSpinAnim').setAttribute('dur', v + 's');
+}, v => String(v));
+/* 呼吸脉冲：逐环独立幅度 + 相位差 + 不对称曲线
+   幅度从内到外递减: 深眼 ±9.9% > 蓝瞳 ±6.0% > 灰紫蓝 ±5.5% > 白环 ±4.1%
+   相位: 内环超前外环, 每环差 ~0.031s (60fps 实录 20260913-130732.mp4 互相关实测)
+   曲线 (60fps 逐周期实测重拟合, 无平顶段——峰驻留来自缓动形状):
+   谷停 15.5% + 慢升 53.3% (.3 0 .3 1) + 缓降 31.2% (.5 0 1 1, 顶部零斜率=顶峰停顿感) */
+function applyBreath(){
+  const T = parseFloat(document.getElementById('pBreath').value);
+  const strength = parseFloat(document.getElementById('pBreathStr').value) / 100;
+  // [id, 幅度, 相位偏移(负=超前)]  内环超前外环, 每环差 ~0.031s
+  const RINGS = [
+    ['whitePulseAnim', 0.041,  0.000],   // 白环 ±4.1%, 基准(最晚)
+    ['slatePulseAnim', 0.055, -0.031],   // 灰紫蓝 ±5.5%, 超前 0.031s
+    ['midPulseAnim',   0.060, -0.062],   // 蓝瞳 ±6.0%, 超前 0.062s
+    ['pupilPulseAnim', 0.099, -0.093],   // 深眼 ±9.9%, 超前 0.093s (按每环 0.031s 外推)
+  ];
+  // 高光摆动与呼吸锁相 (实测), 只同步周期不缩放
+  const sway = document.getElementById('glintSwayAnim');
+  if (sway) sway.setAttribute('dur', T + 's');
+  for (const [id, amp, phase] of RINGS) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const a = amp * strength;
+    const lo = (1 - a).toFixed(4);
+    el.setAttribute('dur', T + 's');
+    el.setAttribute('begin', phase + 's');
+    el.setAttribute('values', `${lo};${lo};1;${lo}`);
+    el.setAttribute('keyTimes', '0;0.155;0.688;1');
+    el.setAttribute('calcMode', 'spline');
+    el.setAttribute('keySplines', '0 0 1 1;0.3 0 0.3 1;0.5 0 1 1');
+  }
+}
+[['pBreath','vBreath',2],['pBreathStr','vBreathStr',0]].forEach(([id,vid,fd]) => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    document.getElementById(vid).textContent = parseFloat(el.value).toFixed(fd);
+    applyBreath();
+  });
+});
+applyBreath();
+
+/* ============ 3. 状态机 ============ */
+const pet = document.getElementById('pet');
+let cur = 'idle';
+
+function setRates(talking){
+  const g = talking ? '1.1s' : '2.4s';
+  document.querySelectorAll('#glowPulse > animateTransform, #glowPulse > animate')
+    .forEach(a => a.setAttribute('dur', g));
+  document.getElementById('scanAnim').setAttribute('dur', talking ? '.22s' : '.5s');
+}
+function setLidB(on){
+  // 长闭眼态: 显示顶弧+底弧
+  document.getElementById('stateB_lid_top').style.display = on ? '' : 'none';
+  document.getElementById('stateB_lid_bot').style.display = on ? '' : 'none';
+}
+function triggerRealBlink(){
+  // 真眨眼: 顶弧+底弧同时从顶部落下再抬起
+  const top = document.getElementById('stateC_lid_top');
+  const bot = document.getElementById('stateC_lid_bot');
+  top.style.display = ''; top.setAttribute('opacity', '1');
+  bot.style.display = ''; bot.setAttribute('opacity', '1');
+  document.getElementById('blinkLidTopAnim').beginElement();
+  document.getElementById('blinkLidBotAnim').beginElement();
+  setTimeout(() => {
+    top.setAttribute('opacity', '0');
+    bot.setAttribute('opacity', '0');
+    setTimeout(() => { top.style.display = 'none'; bot.style.display = 'none'; }, 50);
+  }, 1100);
+}
+function setState(s){
+  pet.classList.remove('talking','glitch','clicked');
+  setLidB(s === 'closed');
+  if (s === 'blink'){
+    triggerRealBlink();
+    setTimeout(() => setState('idle'), 1100);
+    return;
+  }
+  if (s === 'glitch'){
+    pet.classList.add('glitch');
+    setTimeout(() => {
+      pet.classList.remove('glitch');
+      setState('idle');
+    }, 600);
+    cur = 'idle';
+    document.querySelectorAll('#states button').forEach(b =>
+      b.classList.toggle('on', b.dataset.st === 'idle'));
+    return;
+  }
+  if (s !== 'idle') pet.classList.add(s);
+  cur = s;
+  setRates(s === 'talking');
+  document.querySelectorAll('#states button').forEach(b =>
+    b.classList.toggle('on', b.dataset.st === s));
+}
+function blink(){ setState('blink'); }   // 兼容旧 API (双击触发)
+
+document.getElementById('states').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  setState(b.dataset.st);
+});
+pet.addEventListener('click', () => {
+  pet.classList.remove('clicked'); void pet.offsetWidth;
+  pet.classList.add('clicked');
+  setTimeout(() => pet.classList.remove('clicked'), 440);
+});
+pet.addEventListener('dblclick', blink);
+setInterval(() => { if (cur === 'idle' && Math.random() < 0.5) blink(); }, 4200);
+
+/* ============ 4. 动效开关 ============ */
+document.getElementById('toggleGear').onclick = e => {
+  const on = !e.target.classList.contains('on');
+  e.target.classList.toggle('on', on);
+  const a = document.getElementById('gearSpinAnim');
+  if (on){ a.beginElement(); } else { a.endElement(); }   // 关掉即回到实测角度
+};
+document.getElementById('toggleScan').onclick = e => {
+  const on = !e.target.classList.contains('on');
+  e.target.classList.toggle('on', on);
+  document.getElementById('scanWrap').style.display = on ? '' : 'none';
+};
+document.getElementById('toggleGlint').onclick = e => {
+  const on = !e.target.classList.contains('on');
+  e.target.classList.toggle('on', on);
+  document.getElementById('glintG').style.display = on ? '' : 'none';
+};
+document.getElementById('bgDark').onclick = e => {
+  document.body.classList.remove('light');
+  e.target.classList.add('on'); document.getElementById('bgLight').classList.remove('on');
+};
+document.getElementById('bgLight').onclick = e => {
+  document.body.classList.add('light');
+  e.target.classList.add('on'); document.getElementById('bgDark').classList.remove('on');
+};
+
+/* ============ 5. 安全克隆：给所有 id 加前缀并重写 url(#...) ============
+   克隆出的 <defs> 若与原 svg 同名，url(#g) 会解析到文档中第一个匹配项；
+   克隆体常在 display:none 子树里，隐藏子树中的 paint server 会导致填充变黑。 */
+function cloneSvgWithPrefix(source, prefix){
+  const c = source.cloneNode(true);
+  const map = new Map();
+  c.querySelectorAll('[id]').forEach(n => { map.set(n.id, prefix + n.id); n.id = prefix + n.id; });
+  c.querySelectorAll('*').forEach(n => {
+    for (const a of Array.from(n.attributes)){
+      if (a.value.includes('url(#')){
+        let v = a.value;
+        map.forEach((nv, ov) => { v = v.split('url(#' + ov + ')').join('url(#' + nv + ')'); });
+        n.setAttribute(a.name, v);
+      }
+    }
+  });
+  return c;
+}
+
+/* ============ 6. 等比例对比模式 ============ */
+function setupCompare(){
+  if (!location.search.includes('compare')) return;
+  document.body.classList.add('compare');
+  const CORE = 425;                     // 目标核心直径（与官方立绘一致）
+  const svgPx = CORE * 240 / 200;       // viewBox 240 单位 = 核心 200 单位 → 510px
+  svg.setAttribute('width', svgPx);
+  svg.setAttribute('height', svgPx);
+  svg.pauseAnimations();                // 冻结在 t=0：齿轮归零，角度与立绘一致
+  svg.setCurrentTime(0);
+  document.getElementById('cfMine').appendChild(svg);
+
+  document.querySelectorAll('.cfTile img').forEach(img => {
+    img.style.width = '520px'; img.style.height = '520px';
+    img.style.left = (250 - 257.5) + 'px';
+    img.style.top  = (250 - 254.0) + 'px';
+  });
+  document.querySelectorAll('.cfTile').forEach(t => t.style.background = '#0d1220');
+
+  const lay = cloneSvgWithPrefix(svg, 'diff-');
+  lay.setAttribute('width', svgPx);
+  lay.setAttribute('height', svgPx);
+  lay.style.position = 'absolute';
+  lay.style.left = '50%'; lay.style.top = '50%';
+  lay.style.transform = 'translate(-50%,-50%)';
+  lay.style.mixBlendMode = 'difference';
+  document.getElementById('cfDiff').appendChild(lay);
+}
+
+/* ============ 7. 裸渲染模式（透明底，供脚本数值测量） ============ */
+function setupBare(){
+  const q = new URLSearchParams(location.search);
+  if (!q.has('bare')) return;
+  document.body.classList.add('bare');
+  const core = parseFloat(q.get('core') || '425');
+  const px = core * 240 / 200;
+  svg.setAttribute('width', px);
+  svg.setAttribute('height', px);
+  document.body.appendChild(svg);
+  // 扫参钩子：?tip=..&half=.. 临时覆盖尖齿参数，用于拟合官方轮廓
+  if (q.has('tip'))  P.tip  = parseFloat(q.get('tip'));
+  if (q.has('half')) P.half = parseFloat(q.get('half'));
+  if (q.has('tip') || q.has('half')) buildIndigo();
+  if (q.has('autoblink')) {                                // 测试钩子：延时触发一次真眨眼
+    svg.setCurrentTime(0);
+    setTimeout(() => {
+      document.getElementById('blinkLidTopAnim').beginElement();
+      document.getElementById('blinkLidBotAnim').beginElement();
+    }, parseFloat(q.get('autoblink')));
+  } else {
+    svg.pauseAnimations();                                 // 确定性：先冻结
+    svg.setCurrentTime(q.has('freeze') ? parseFloat(q.get('freeze')) : 0);
+  }
+}
+
+/* ============ 8. 收尾 ============ */
+buildIndigo();
+document.getElementById('mini').appendChild(cloneSvgWithPrefix(svg, 'mini-'));
+setupCompare();
+setupBare();
+
+/* ============ 9. URL 启动参数 ============ */
+const q = new URLSearchParams(location.search);
+if (q.has('state')){
+  const s = q.get('state');
+  if (['idle','talking','closed','blink','glitch'].includes(s)){
+    setTimeout(() => setState(s), 200);
+  }
+}
+if (q.has('freeze') && !q.has('bare')){
+  const t = parseFloat(q.get('freeze'));
+  setTimeout(() => { svg.pauseAnimations(); svg.setCurrentTime(t); }, 200);
+}
+</script>
+</body>
+</html>

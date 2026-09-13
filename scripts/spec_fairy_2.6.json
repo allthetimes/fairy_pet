@@ -1,0 +1,16 @@
+{
+  "source": "fairy_2.6.png",
+  "image_size": [
+    520,
+    520
+  ],
+  "center": [
+    257.5,
+    254.0
+  ],
+  "rmax": 254,
+  "radial": [
+    {
+      "r": 0.0,
+      "rgb": [
+        

@@ -1,0 +1,16 @@
+{
+  "source": "hd_avatar.png",
+  "image_size": [
+    604,
+    604
+  ],
+  "center": [
+    334.5,
+    331.0
+  ],
+  "rmax": 269,
+  "radial": [
+    {
+      "r": 0.0,
+      "rgb": [
+        

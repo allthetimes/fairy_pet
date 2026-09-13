@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="PVqE3KxAbWH0FAMKEZ0z0m">
+<head data-page-node-id="LqxJbN0E76rGOac9kuX27e">
+<meta charset="utf-8" data-page-node-id="nSamWFcKRtHn1iaAdhjrBK">
+<title>Fairy 动画 vs 实机视频 · 同步对比台</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font:13px/1.6 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+  body{
+    --stage:#080b14; --panel:#10162a; --line:#26314e; --txt:#dbe3f5; --dim:#8494b6; --accent:#4b7cf3;
+    background:var(--stage); color:var(--txt);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  header{
+    flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+    padding:10px 14px; background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  header h1{font-size:14px; margin:0 14px 0 0; letter-spacing:.02em}
+  button{font:12px/1 inherit; padding:7px 11px; border-radius:6px; cursor:pointer;
+    background:transparent; color:var(--txt); border:1px solid var(--line); transition:.13s}
+  button:hover{border-color:var(--accent); color:var(--accent)}
+  button.on{background:var(--accent); border-color:var(--accent); color:#fff}
+  .grp{display:flex; align-items:center; gap:6px; padding:0 10px; border-left:1px solid var(--line); height:26px}
+  .grp label{font-size:11px; color:var(--dim); white-space:nowrap}
+  .grp input[type=range]{width:90px; accent-color:var(--accent)}
+  .grp b{font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; min-width:44px; color:var(--txt)}
+  #readout{margin-left:auto; font-size:11px; color:var(--dim); font-variant-numeric:tabular-nums; white-space:nowrap}
+  #readout b{color:var(--txt)}
+
+  main{flex:1; min-height:0; display:flex; align-items:center; justify-content:center; gap:22px; padding:14px}
+  .col{display:flex; flex-direction:column; align-items:center; gap:8px}
+  .cap{font-size:12px; color:var(--dim); text-align:center}
+  .cap b{color:var(--txt)}
+  .crop{position:relative; overflow:hidden; background:#04060c;
+        border:1px solid var(--line); border-radius:10px; flex:none}
+  .crop video,.crop svg{position:absolute; margin:0}
+  .hint{position:absolute; left:0; right:0; bottom:0; text-align:center; font-size:11px;
+        color:rgba(219,227,245,.55); padding:5px; pointer-events:none;
+        background:linear-gradient(transparent, rgba(4,6,12,.7))}
+</style>
+</head>
+<body data-page-node-id="O8rJBQn3ULCeSZUeYi0Y0K">
+
+<header data-page-node-id="QVGegmjnWVd7Qhh8etbC7R">
+  <h1 data-page-node-id="i2ujttMfrHfPhTIfprjabA">Fairy 同步对比台</h1>
+  <button id="btnPlay" data-page-node-id="eAf3N7ycJHyhijnY7zhwDP">▶ 同步播放</button>
+  <button id="btnRestart" data-page-node-id="g3orY8mGUs1ZAmFIVvE5Dv">⟲ 从头同步</button>
+  <div class="grp" data-page-node-id="aehflejlUYd3MHkJwyZxId">
+    <button data-rate="1" class="on" data-page-node-id="FGQbe8Rkj9qIIuSfChMhmU">1x</button>
+    <button data-rate="0.5" data-page-node-id="MZlIxPFRTvFeOA7BCMUtnN">0.5x</button>
+    <button data-rate="0.25" data-page-node-id="x29Q5jkkhJgJ7OEUR29pDw">0.25x</button>
+    <button data-rate="0.1" data-page-node-id="nyaAgRpWGJopVwgvtVubKZ">0.1x</button>
+  </div>
+  <div class="grp" data-page-node-id="YOiwCSIlADWFauT31EG7Gl">
+    <button data-mode="side" class="on" data-page-node-id="gIg29IVzDeYGXMxGxRsuRA">并排</button>
+    <button data-mode="over" data-page-node-id="tx5idgbgZNhiMjob7ss3tW">叠加</button>
+    <button data-mode="diff" data-page-node-id="iuNyaSdKsHYX6jR34mBdUD">差值</button>
+  </div>
+  <div class="grp" id="grpAlpha" style="display:none" data-page-node-id="19AHGkRzvEpnXyYpoGwbDo">
+    <label data-page-node-id="FVMfpEZHUXnGWCvYYaBcde">动画不透明度</label>
+    <input type="range" id="alpha" min="10" max="100" value="55" data-page-node-id="GEtUQNGMZuNoREg8BcE0X8">
+    <b id="alphaV" data-page-node-id="fosWGED7ekQMd5No6uUMQC">55%</b>
+  </div>
+  <div class="grp" data-page-node-id="fFMdPapj34lNRKtDK0Nnot">
+    <label data-page-node-id="YwijYTgFIrtPA3WBMTZhLl">呼吸相位对齐</label>
+    <input type="range" id="phase" min="-0.45" max="0.45" step="0.005" value="0.341" data-page-node-id="vKmEDxy3bM4PPcmsehNs4y">
+    <b id="phaseV" data-page-node-id="aICuh58MLSPlbjk3b0mXUx">+0.350s</b>
+  </div>
+  <div class="grp" data-page-node-id="EYtM5PIGlQsiBo0ReMrdfW">
+    <label data-page-node-id="jDieXCtYYFRtPvHbrvsv0c">对齐 X</label><input type="range" id="adjX" min="-20" max="20" step="0.5" value="0" data-page-node-id="5NxqzHrkcl5IIvmA2qlBwX"><b id="adjXV" data-page-node-id="bwgPBJYNGMTG8xaEZi0Gq8">0</b>
+    <label data-page-node-id="vu0yXCGauQ6e5eFSr3ZnsL">Y</label><input type="range" id="adjY" min="-20" max="20" step="0.5" value="0" data-page-node-id="mohV4qT3gdDYv6IBXrE3Re"><b id="adjYV" data-page-node-id="VCQh78MAPnIwwyy7j3P5ul">0</b>
+    <label data-page-node-id="Dd5VR1DuclyWYP8FVfRnKs">缩放</label><input type="range" id="adjS" min="0.92" max="1.08" step="0.002" value="1" data-page-node-id="KyPrqJ7jsSloufEurrj15c"><b id="adjSV" data-page-node-id="q0maxBWPn5qj8AvXzxFvlf">1.000</b>
+  </div>
+  <div class="grp" data-page-node-id="86XhHW0wVBbxlSScojzEtF">
+    <label data-page-node-id="wgpHG78vr9pLscjpQrtmuF">齿轮相位</label>
+    <input type="range" id="gearPh" min="0" max="18.15" step="0.01" value="15.67" data-page-node-id="XiRrMzAjfUjUkZARTVZRyf">
+    <b id="gearPhV" data-page-node-id="S14aB5InaNia33ZapX9NtR">15.67s</b>
+    <label data-page-node-id="QGJ9hn4fustbIAaBFDOy81">齿轮周期</label>
+    <input type="range" id="gearT" min="4" max="24" step="0.01" value="18.13" data-page-node-id="OLP6imZyWqicvYFHzPW74l">
+    <b id="gearTV" data-page-node-id="MvtaCLR1gDQ8vPIcjA2viS">18.1s</b>
+  </div>
+  <div class="grp" data-page-node-id="Bzo2e17vRyXmPRBk8WDX3C">
+    <label data-page-node-id="78luLqDgggkYaejnwURVMZ">视图</label><input type="range" id="zoom" min="0.6" max="2.4" step="0.05" value="1" data-page-node-id="McOaJW0Eco0zF43I4JnfAM"><b id="zoomV" data-page-node-id="hgZv13XS7mbGroBOC6F0yG">1.00x</b>
+    <button id="btnMute" data-page-node-id="XeoAW0XRQqsQntoHy43SCW">🔇 静音</button>
+  </div>
+  <div id="readout" data-page-node-id="pelCDUWVGde1AiCmb4ZI8V">视频 <b id="tVid" data-page-node-id="21uWWWSmtZj3gpi0P65gp1">0.000s</b> · 动画 <b id="tSvg" data-page-node-id="B3GVDOOZeSrbcvubRBaexU">0.350s</b> · <span id="fpsRead" data-page-node-id="CRQG1Kh1OJE6R0IYMTeesi">-- fps</span></div>
+</header>
+
+<main data-page-node-id="hPfHyDyoA3tfhexXjCz5A7">
+  <div class="col" id="colVideo" data-page-node-id="2uLSvX274EZcFBJLKDnNR3">
+    <div class="crop" id="cropVideo" data-page-node-id="MavMvOdy3bu8a3ejygcPW4">
+      <video id="vid" src="20260913-130732.mp4" loop muted playsinline preload="auto" data-page-node-id="9IKEpKMJimV50bnAmG6Nag"></video>
+      <div class="hint" data-page-node-id="UR4qC0dv2908Q8okr3q7uv">实机视频 60fps（主时钟）</div>
+    </div>
+    <div class="cap" data-page-node-id="UrVbtXzpINFeFEGwhKEtck"><b data-page-node-id="ee2XdUdmcDGZRwVfCAe47H">左 · 实机视频</b> — 空格播放/暂停，←→ 逐帧（暂停时）</div>
+  </div>
+  <div class="col" id="colSvg" data-page-node-id="urVZG65ZO82hb7JkIoSlcj">
+    <div class="crop" id="cropSvg" data-page-node-id="aJOSc8O6YMEGj9WclLhNdU">
+      <div class="hint" data-page-node-id="ucDxxe3nmCKNhMzj1hFHW8">代码复刻 SMIL（由视频时钟驱动）</div>
+    </div>
+    <div class="cap" data-page-node-id="EBwRTsJDpXglSD1iza1c5d"><b data-page-node-id="Iwr2lGjqwgbfxGG0K8vYmU">右 · 代码复刻</b></div>
+  </div>
+  <div class="col" id="colOver" style="display:none" data-page-node-id="hvvy4NaT2XuvVQRJ8eNegq">
+    <div class="crop" id="cropOver" data-page-node-id="GJCscZ3HYbBZYWXlHJyBj8"></div>
+    <div class="cap" id="capOver" data-page-node-id="gIpVyxpB9rIlW5I5JEoFXF"><b data-page-node-id="lxHhdvoo4655gafJzKivco">叠加</b> — 亮环错位即差距；差值模式下重合处近黑</div>
+  </div>
+</main>
+
+<!-- ============ 动画本体：与 fairy-lab.html 同源（几何/渐变逐字一致） ============ -->
+<div id="stash" style="position:absolute;width:0;height:0;overflow:hidden" data-page-node-id="TsALIAA4OVWVVTz3dQHxDE">
+<svg id="svg" viewBox="-120 -120 240 240" data-page-node-id="AASa4q1yl9PsSTO7LBRtvF">
+  <defs data-page-node-id="ZjYImQVWFdQWTfaSORi6MF">
+    <radialGradient id="gOuterBlue" cx="50%" cy="50%" r="50%" data-page-node-id="YUVJhlWE5qeqntCojdJf83">
+      <stop offset="78.1%" stop-color="#2D3DD0" data-page-node-id="y7zMCwEYpuEYp9qIBgVDsZ"/>
+      <stop offset="84%"   stop-color="#2E3FD8" data-page-node-id="gRoeacL0Gp5wnxygPtzN7K"/>
+      <stop offset="92%"   stop-color="#3145E6" data-page-node-id="kEEXNMdU0gOUGEdbeadynO"/>
+      <stop offset="100%"  stop-color="#3549EC" data-page-node-id="P4McVXMS66NemlvpfhdqFL"/>
+    </radialGradient>
+    <!-- 环带可见区 62.2-78.1u 的 stops 按 2.6 视频实测重写 (2026-09-13 去掉白环外缘亮带, 与 fairy-lab 同步; +4% 补偿扫描线) -->
+    <radialGradient id="gIndigo" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="93" data-page-node-id="f6YqrHhtfjBMXZKNMR1qVp">
+      <stop offset="66.9%" stop-color="#373699" data-page-node-id="xojEHEkWk5bvAvDzDxJPCB"/>
+      <stop offset="68.8%" stop-color="#303089" data-page-node-id="QrkHJnGhVxN1PQY2GIKTsv"/>
+      <stop offset="71.0%" stop-color="#2B297D" data-page-node-id="ZY0KNoLw06k2tKciPGd43o"/>
+      <stop offset="75.3%" stop-color="#221F7A" data-page-node-id="IjkVDQhJksD7Q0pavdUaEs"/>
+      <stop offset="79.6%" stop-color="#1D1C7C" data-page-node-id="Cq18fV4tX7wA2kM9eR5nBd"/>
+      <stop offset="81.7%" stop-color="#212182" data-page-node-id="Ds40aW6yH8xB3jP1gT7qKf"/>
+      <stop offset="84.0%" stop-color="#212382" data-page-node-id="Eu51bX7zJ9yC4kQ2hU8rLg"/>
+      <stop offset="92.5%" stop-color="#1D208A" data-page-node-id="XC52OlojCR0DcguUyinDqb"/>
+      <stop offset="96.8%" stop-color="#1A2094" data-page-node-id="eLNinmFQuIhjTv2wUNwu2v"/>
+      <stop offset="100%"  stop-color="#17209C" data-page-node-id="TygXP6FtItkglBCkHPFwny"/>
+    </radialGradient>
+    <radialGradient id="gWhite" cx="50%" cy="50%" r="50%" data-page-node-id="qyEs2nxcLNgGpNrTTUc4dH">
+      <stop offset="69.3%" stop-color="#DEDAE3" data-page-node-id="cfmqG5Wz4BY3nR3yBopgoT"/>
+      <stop offset="100%"  stop-color="#D7D3DC" data-page-node-id="1LMpzI0hJIgHH6pdCWCnzH"/>
+    </radialGradient>
+    <radialGradient id="gSlate" cx="50%" cy="50%" r="50%" data-page-node-id="1AAn8hs2IU1yCavAN1cTJX">
+      <stop offset="68.5%" stop-color="#848FC8" data-page-node-id="IPSk8swU5BymDHEa7v8jDh"/>
+      <stop offset="100%"  stop-color="#8995CB" data-page-node-id="joVLw4uDRdGLBLB96nL62Z"/>
+    </radialGradient>
+    <radialGradient id="gMidBlue" cx="50%" cy="50%" r="50%" data-page-node-id="AMR2BHfZMFC2xbkqvhEErX">
+      <stop offset="0%"    stop-color="#2A4FA6" data-page-node-id="3DyVsqeh53MYYI3MzKZfgM"/>
+      <stop offset="70%"   stop-color="#2C57B4" data-page-node-id="Fm7NYo5hBlMgoL0GFGR4Ka"/>
+      <stop offset="82%"   stop-color="#2D62C0" data-page-node-id="JTNEHgxgGkkAFCrfkTOZ1z"/>
+      <stop offset="100%"  stop-color="#6183C6" data-page-node-id="qvWo9ydXJ9kkJHLqDgLj6B"/>
+    </radialGradient>
+    <radialGradient id="gPupil" cx="50%" cy="50%" r="50%" data-page-node-id="RUNdVd4YGAIbU3GSA0f0Q3">
+      <stop offset="0%"   stop-color="#2C4684" data-page-node-id="V7vLHDgJNd0woZUgdmDzAw"/>
+      <stop offset="80%"  stop-color="#2D4585" data-page-node-id="CUApp3BHlk1VF3pjBbc4Xa"/>
+      <stop offset="100%" stop-color="#2C4A8D" data-page-node-id="drNG32GytZjjpUG2FvLMbU"/>
+    </radialGradient>
+    <radialGradient id="gGlow" cx="50%" cy="50%" r="50%" data-page-node-id="1E0n1gbGpAmKNaygn5DE1Y">
+      <stop offset="0%"   stop-color="rgba(74,126,255,0)" data-page-node-id="A0yQKxgWU4gpM75cBjVOxH"/>
+      <stop offset="64%"  stop-color="rgba(62,110,255,.10)" data-page-node-id="HJSutswz1ljAgCz5G2Hvgs"/>
+      <stop offset="74%"  stop-color="rgba(92,146,255,.62)" data-page-node-id="QHr5fIH4V5U2VW4bnIHi1s"/>
+      <stop offset="84%"  stop-color="rgba(74,126,255,.26)" data-page-node-id="EgzxOHDE17w7lXzoQ6JbRd"/>
+      <stop offset="100%" stop-color="rgba(74,126,255,0)" data-page-node-id="o3vdj1UYOiL7dlIyhWGvGL"/>
+    </radialGradient>
+    <radialGradient id="gGlint" cx="50%" cy="50%" r="50%" data-page-node-id="1xWKUEkX3gI8LgjVpAxjLf">
+      <!-- 2026-09-13 霍夫拟合实测: 实心锐边圆盘 r≈14.1u, 无渐变尾(角向平均假象), 仅留0.5u抗锯齿羽化 -->
+      <stop offset="0%"   stop-color="#DBDBEB" data-page-node-id="kGq7y0LU4N6fPlZNsCnqtR"/>
+      <stop offset="96%"  stop-color="#DBDBEB" data-page-node-id="C0cESmNiS9HIhGGqqPECS4"/>
+      <stop offset="100%" stop-color="#DBDBEB" stop-opacity="0" data-page-node-id="c2NHnFCKhi6ZKA2oDFmiBF"/>
+    </radialGradient>
+    <pattern id="scanlines" width="4" height="2.2" patternUnits="userSpaceOnUse" data-page-node-id="i6UXIbQJlmFEq995FgKKvk">
+      <rect width="4" height="1.1" fill="#000" opacity=".105" data-page-node-id="zhkf2cBCQHW6hJdl7lDHSU"/>
+    </pattern>
+    <clipPath id="clipCore" data-page-node-id="z5fsOnLJrSzKeB13dSR5px"><circle r="100" data-page-node-id="FJy0EdOjmCj8Ye9WjPJ4Va"/></clipPath>
+    <radialGradient id="gLid" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="100" data-page-node-id="FWsHdyJaNnb8cziHMp8Dvb">
+      <stop offset="0%"    stop-color="#1B1F88" data-page-node-id="EuysEC8CVXuBdEqEboxWj1"/>
+      <stop offset="80%"   stop-color="#1E2080" data-page-node-id="rqstGkwsXInawd2dnQKFSo"/>
+      <stop offset="100%"  stop-color="#17209C" data-page-node-id="FI0XdXc6LOm7BFQ1b0o1EJ"/>
+    </radialGradient>
+  </defs>
+
+  <g id="glowPulse" data-page-node-id="FK4So9F5aGERNQKCHTXy6f">
+    <animateTransform attributeName="transform" type="scale" values="0.965;1.045;0.965" dur="2.4s" repeatCount="indefinite" data-page-node-id="aSZlHLAiyL50n9KPWAH0HT"/>
+    <animate attributeName="opacity" values=".72;1;.72" dur="2.4s" repeatCount="indefinite" data-page-node-id="Gtj7ibs4Nls9STKhLxbkdt"/>
+    <circle r="135" fill="url(#gGlow)" style="mix-blend-mode:screen" data-page-node-id="3AL8tICMWDZogKhiipcMfR"/>
+    <circle r="118" fill="url(#gGlow)" style="mix-blend-mode:screen" opacity=".55" data-page-node-id="FFIuVkQTCmS8rEf29cEdrn"/>
+  </g>
+
+  <g class="core" data-page-node-id="la8OgEPQfhvDM2xy840x1y">
+   <g id="corePulse" data-page-node-id="mJUNHrGDFXbwP0HDWXW1kb">
+    <circle id="lyOuter" r="100" fill="url(#gOuterBlue)" data-page-node-id="1xER8b4alOJ8Vp2IBNWlsQ"/>
+
+    <g id="gearSpin" data-page-node-id="jMocCfQU6YS30EZjfsG7Q1">
+      <animateTransform id="gearSpinAnim" attributeName="transform" type="rotate"
+                        from="0" to="360" dur="18.13s" repeatCount="indefinite" data-page-node-id="BAJB1BLxaGZlReSm5CxkfK"/>
+      <path id="indigoShape" fill="url(#gIndigo)" data-page-node-id="kYKkXGGLzZILbcWqNMS0Sn"/>
+    </g>
+
+    <g id="whitePulse" data-page-node-id="5eiZP3i8sECObGPkXF4hEF">
+      <animateTransform id="whitePulseAnim" attributeName="transform" type="scale"
+                        values="1;1;0.959;0.959;1" keyTimes="0;0.3;0.5;0.8;1"
+                        calcMode="spline" keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                        dur="0.7s" repeatCount="indefinite" data-page-node-id="aaIsTNvAC1YlwEP2hNbGCv"/>
+      <circle id="lyWhite" r="62.2" fill="url(#gWhite)" data-page-node-id="wBlByj9EOKXNpUQwbUeGWc"/>
+    </g>
+
+    <g id="slatePulse" data-page-node-id="LEAmc5SuA4k7cD5UH7HMl9">
+      <animateTransform id="slatePulseAnim" attributeName="transform" type="scale"
+                        values="1;1;0.945;0.945;1" keyTimes="0;0.3;0.5;0.8;1"
+                        calcMode="spline" keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                        dur="0.7s" repeatCount="indefinite" data-page-node-id="UgegXiLoEZJRARMGsDOBkj"/>
+      <circle id="lySlate" r="41.5" fill="url(#gSlate)" data-page-node-id="D9mq4VSTv2OFuT5yMaTKg6"/>
+    </g>
+
+    <g id="midPulse" data-page-node-id="E3d8fmiCYFXdUfPQBUHKVt">
+      <animateTransform id="midPulseAnim" attributeName="transform" type="scale"
+                        values="1;1;0.933;0.933;1" keyTimes="0;0.3;0.5;0.8;1"
+                        calcMode="spline" keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                        dur="0.7s" repeatCount="indefinite" data-page-node-id="PTLAEOUHVw943I3p2VLv0k"/>
+      <circle id="irisMid" r="28.1" fill="url(#gMidBlue)"
+              stroke="#F4F6FF" stroke-width="0.7" stroke-opacity="0.85" data-page-node-id="siqVH2VeanfBLR8AVtYCRG"/>
+    </g>
+
+    <g id="pupilPulse" data-page-node-id="u1x08ArDAtEmSUfqqDCoF8">
+      <animateTransform id="pupilPulseAnim" attributeName="transform" type="scale"
+                        values="1;1;0.901;0.901;1" keyTimes="0;0.3;0.5;0.8;1"
+                        calcMode="spline" keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                        dur="0.7s" repeatCount="indefinite" data-page-node-id="9UCzJTcs23dB1tZrCqUtDB"/>
+      <circle id="irisPupil" r="19.9" fill="url(#gPupil)"
+              stroke="#F4F6FF" stroke-width="0.6" stroke-opacity="0.8" data-page-node-id="DOkk5zYLO1gVGZ6GoSxit5"/>
+    </g>
+
+    <g id="glintPulse" data-page-node-id="QoAjAhTCxdJdaGr0FCu67S">
+      <!-- 2026-09-13 实测: 尺寸恒定不随呼吸, 位置呼吸锁相小幅摆动 ±(0.3,0.6)u -->
+      <g id="glintG" data-page-node-id="FZSMZpOZ4Geuh0HFSn1EyF">
+        <animateTransform id="glintSwayAnim" attributeName="transform" type="translate"
+                          values="-0.12 -0.32;-0.03 -0.16;0.08 0.13;0.14 0.32;0.15 0.33;0.15 0.32;0.08 0.11;-0.1 -0.31;-0.38 -0.85;-0.38 -0.74;-0.21 -0.48;-0.12 -0.32"
+                          keyTimes="0;0.05;0.15;0.25;0.35;0.45;0.55;0.65;0.75;0.85;0.95;1"
+                          calcMode="spline"
+                          keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"
+                          dur="0.867s" repeatCount="indefinite" data-page-node-id="wAQHZWGR4sILC3imlt1Fzm"/>
+        <circle cx="20.2" cy="27.2" r="14.1" fill="url(#gGlint)" data-page-node-id="xmBoXh4MF29WzCuKd8cDsU"/>
+      </g>
+    </g>
+
+    <!-- 眨眼眼睑: 对比台固定 A 状态, 常隐藏 -->
+    <g id="stateB_lid_bot" style="display:none" data-page-node-id="ORG08MeBREyMJOtYeedEjO">
+      <path d="M 78.1 0 A 200 200 0 0 1 -78.1 0" fill="url(#gLid)" data-page-node-id="z7K2s8lGU2dEitlMvHugLo"/>
+    </g>
+    <g id="stateC_lid_bot" opacity="0" style="display:none" data-page-node-id="l3eLX2xLvOzF62bT5UYx1D">
+      <path d="M 78.1 0 A 200 200 0 0 1 -78.1 0" fill="url(#gLid)" data-page-node-id="Jo6wwRgQsSy3zDSZJ5MUJJ"/>
+    </g>
+
+    <g id="scanWrap" clip-path="url(#clipCore)" opacity=".62" data-page-node-id="UUI0np5ibCkRoO74hvgQvF">
+      <g id="scanG" data-page-node-id="zqlCPUcJb4FDLkhwIEVJfc">
+        <animateTransform id="scanAnim" attributeName="transform" type="translate"
+                          from="0 0" to="0 2.2" dur=".5s" repeatCount="indefinite" data-page-node-id="sF3ZwDF6HJA5OlBfpYI5v5"/>
+        <rect x="-120" y="-120" width="240" height="240" fill="url(#scanlines)" data-page-node-id="29OUtEPX7WppG9g7CkLZcW"/>
+      </g>
+    </g>
+
+    <circle r="100" fill="none" stroke="#BCC4F2" stroke-width="2.3" opacity=".85" data-page-node-id="Z24y419fFy5uAvZG91w1gO"/>
+
+    <g id="stateB_lid_top" style="display:none" data-page-node-id="aP5pnQstwejwScGy69mEwO">
+      <path d="M -78.1 0 A 78.1 78.1 0 0 1 78.1 0 L -78.1 0 Z" fill="url(#gLid)" data-page-node-id="PsDrpX3qpgusJ1ZtDD9Flr"/>
+    </g>
+    <g id="stateC_lid_top" opacity="0" style="display:none" data-page-node-id="E83uWu9Y0RqTLA38Wu8S27">
+      <path d="M -78.1 0 A 78.1 78.1 0 0 1 78.1 0 L -78.1 0 Z" fill="url(#gLid)" data-page-node-id="itcQXCSv6wC1uVlgYogy6H"/>
+    </g>
+   </g>
+  </g>
+</svg>
+</div>
+
+<script>
+/* ============================================================
+   自动对齐参数 (scripts/compare_align.py 实测 20260913-130732.mp4)
+   cx/cy: 核心圆心 (视频像素)   R_px: 最外白描边半径 = SVG r=100
+   T: 白环呼吸实测周期      P0: 相位偏移 (互相关 0.933)
+   ============================================================ */
+const ALIGN = { cx:470.47, cy:539.34, R:216.77, T:0.8667, P0:0.3413, corr:0.980, W:1920, H:1080 };
+const svg = document.getElementById('svg');
+const vid = document.getElementById('vid');
+
+/* ---------- 靛蓝层: 环带 + 四尖齿, 单一 path (同 fairy-lab) ---------- */
+const NOTCH_ANGLE = [33.5, 123.5, 213.5, 303.5];
+const P = { base:78.1, tip:93.0, half:12.5 };
+function buildIndigo(){
+  const R = P.base, T = P.tip, H = P.half, A = NOTCH_ANGLE, n = A.length;
+  const pt = (r, deg) => {
+    const t = deg * Math.PI / 180;
+    return `${(r * Math.cos(t)).toFixed(2)} ${(r * Math.sin(t)).toFixed(2)}`;
+  };
+  let d = `M ${pt(T, A[0])}`;
+  for (let i = 0; i < n; i++){
+    const nextAbs = (i === n - 1) ? A[0] + 360 : A[i + 1];
+    d += ` L ${pt(R, A[i] + H)}`;
+    d += ` A ${R} ${R} 0 0 1 ${pt(R, nextAbs - H)}`;
+    d += ` L ${pt(T, nextAbs)}`;
+  }
+  document.getElementById('indigoShape').setAttribute('d', d + ' Z');
+}
+
+/* ---------- 逐环呼吸: 参数同 fairy-lab, 周期用实测值 ---------- */
+function applyBreath(){
+  const T = ALIGN.T;
+  const RINGS = [
+    ['whitePulseAnim', 0.041,  0.00],
+    ['slatePulseAnim', 0.055, -0.031],
+    ['midPulseAnim',   0.060, -0.062],
+    ['pupilPulseAnim', 0.099, -0.093],
+  ];
+  // 高光摆动与呼吸锁相 (实测), 只同步周期不缩放
+  const sway = document.getElementById('glintSwayAnim');
+  if (sway) sway.setAttribute('dur', T + 's');
+  for (const [id, amp, phase] of RINGS) {
+    const el = document.getElementById(id);
+    const a = amp;
+    const lo = (1 - a).toFixed(4);
+    el.setAttribute('dur', T + 's');
+    el.setAttribute('begin', phase + 's');
+    el.setAttribute('values', `${lo};${lo};1;${lo}`);
+    el.setAttribute('keyTimes', '0;0.155;0.688;1');
+    el.setAttribute('calcMode', 'spline');
+    el.setAttribute('keySplines', '0 0 1 1;0.3 0 0.3 1;0.5 0 1 1');
+  }
+}
+
+/* ---------- 舞台: 以核心为中心裁剪视频帧, SVG 按实测半径铺放 ---------- */
+const CROP_FACTOR = 2.6;                       // 舞台边长 = 2.6 x 核心半径
+let mode = 'side';
+const cropVideo = document.getElementById('cropVideo');
+const cropSvg   = document.getElementById('cropSvg');
+const cropOver  = document.getElementById('cropOver');
+
+function sizeStage(crop, big){
+  const side = big ? Math.min(innerHeight * 0.78, innerWidth * 0.62, 780)
+                   : Math.min(innerHeight * 0.62, innerWidth * 0.44, 540);
+  crop.style.width = crop.style.height = side + 'px';
+}
+function place(crop, videoHere, svgHere){
+  const side = parseFloat(crop.style.width);
+  const f = side / (CROP_FACTOR * ALIGN.R);           // CSS px / 视频px
+  const s = ALIGN.R / 100 * adjS();                   // SVG单位 -> 视频px (含手动缩放)
+  if (videoHere){
+    vid.style.width  = ALIGN.W * f + 'px';
+    vid.style.height = ALIGN.H * f + 'px';
+    vid.style.left = (-(ALIGN.cx - CROP_FACTOR * ALIGN.R / 2) * f) + 'px';
+    vid.style.top  = (-(ALIGN.cy - CROP_FACTOR * ALIGN.R / 2) * f) + 'px';
+  }
+  if (svgHere){
+    const w = 240 * s * f;   /* viewBox -120..120 = 240 单位 */
+    svg.setAttribute('width', w); svg.setAttribute('height', w);
+    svg.style.width = w + 'px'; svg.style.height = w + 'px';
+    svg.style.left = (side / 2 - 120 * s * f + adjX() * f) + 'px';
+    svg.style.top  = (side / 2 - 120 * s * f + adjY() * f) + 'px';
+  }
+}
+function layout(){
+  if (mode === 'side'){
+    sizeStage(cropVideo, false); sizeStage(cropSvg, false);
+    place(cropVideo, true, false);
+    place(cropSvg, false, true);
+  } else {
+    sizeStage(cropOver, true);
+    place(cropOver, true, true);
+  }
+}
+
+/* ---------- 模式切换: 同一个 video/svg 节点在容器间搬移 ---------- */
+function setMode(m){
+  mode = m;
+  document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  document.getElementById('grpAlpha').style.display = (m === 'over') ? '' : 'none';
+  document.getElementById('colVideo').style.display = (m === 'side') ? '' : 'none';
+  document.getElementById('colSvg').style.display   = (m === 'side') ? '' : 'none';
+  document.getElementById('colOver').style.display  = (m === 'side') ? 'none' : '';
+  if (m === 'side'){
+    cropVideo.appendChild(vid);
+    cropSvg.appendChild(svg);
+    svg.style.mixBlendMode = 'normal';
+    applyAlpha(1);
+  } else {
+    cropOver.appendChild(vid);
+    cropOver.appendChild(svg);
+    svg.style.mixBlendMode = (m === 'diff') ? 'difference' : 'normal';
+    applyAlpha(m === 'diff' ? 1 : parseFloat(document.getElementById('alpha').value) / 100);
+  }
+  document.getElementById('capOver').innerHTML = m === 'diff'
+    ? '<b>差值</b> — 重合处近黑，错位处发亮'
+    : '<b>叠加</b> — 亮环错位即差距';
+  layout();
+}
+function applyAlpha(a){
+  svg.style.opacity = (mode === 'diff') ? 1 : a;
+  if (mode === 'diff'){ svg.style.opacity = 1; }
+}
+
+/* ---------- 主时钟: 视频驱动 SMIL (setCurrentTime 逐帧跟随) ---------- */
+svg.pauseAnimations();                         // 冻结 SMIL 自有时钟
+let phase = ALIGN.P0;
+let playing = false;
+let lastT = 0, fpsAcc = 0, fpsN = 0, fpsShown = 0;
+
+function loop(now){
+  const t = vid.currentTime + phase;
+  svg.setCurrentTime(t);
+  document.getElementById('tVid').textContent = vid.currentTime.toFixed(3) + 's';
+  document.getElementById('tSvg').textContent = t.toFixed(3) + 's';
+  if (lastT){
+    fpsAcc += 1 / Math.max((now - lastT) / 1000, 1e-3); fpsN++;
+    if (fpsN >= 30){ fpsShown = fpsAcc / fpsN; fpsAcc = 0; fpsN = 0;
+      document.getElementById('fpsRead').textContent = fpsShown.toFixed(0) + ' fps'; }
+  }
+  lastT = now;
+  requestAnimationFrame(loop);
+}
+
+/* ---------- 控件 ---------- */
+function adjX(){ return parseFloat(document.getElementById('adjX').value); }
+function adjY(){ return parseFloat(document.getElementById('adjY').value); }
+function adjS(){ return parseFloat(document.getElementById('adjS').value); }
+
+function togglePlay(){
+  if (vid.paused){ vid.play().catch(()=>{}); playing = true; }
+  else { vid.pause(); playing = false; }
+  document.getElementById('btnPlay').textContent = vid.paused ? '▶ 同步播放' : '⏸ 暂停';
+}
+document.getElementById('btnPlay').onclick = togglePlay;
+document.getElementById('btnRestart').onclick = () => {
+  vid.currentTime = 0; svg.setCurrentTime(phase);
+};
+document.querySelectorAll('[data-rate]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('[data-rate]').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  vid.playbackRate = parseFloat(b.dataset.rate);
+});
+document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+document.getElementById('alpha').oninput = e => {
+  document.getElementById('alphaV').textContent = e.target.value + '%';
+  applyAlpha(parseFloat(e.target.value) / 100);
+};
+document.getElementById('phase').oninput = e => {
+  phase = parseFloat(e.target.value);
+  document.getElementById('phaseV').textContent = (phase >= 0 ? '+' : '') + phase.toFixed(3) + 's';
+};
+['adjX','adjY','adjS'].forEach((id, i) => {
+  document.getElementById(id).oninput = e => {
+    const v = parseFloat(e.target.value);
+    document.getElementById(['adjXV','adjYV','adjSV'][i]).textContent =
+      i === 2 ? v.toFixed(3) : (v >= 0 ? '+' : '') + v.toFixed(1);
+    layout();
+  };
+});
+document.getElementById('zoom').oninput = e => {
+  const z = parseFloat(e.target.value);
+  document.getElementById('zoomV').textContent = z.toFixed(2) + 'x';
+  const target = (mode === 'side') ? [cropVideo, cropSvg] : [cropOver];
+  target.forEach(c => { c.style.transform = `scale(${z})`; c.style.transformOrigin = 'center'; });
+  document.querySelector('main').style.gap = (22 * z) + 'px';
+};
+document.getElementById('gearPh').oninput = e => {
+  const v = parseFloat(e.target.value);
+  document.getElementById('gearPhV').textContent = v.toFixed(2) + 's';
+  document.getElementById('gearSpinAnim').setAttribute('begin', (-v) + 's');
+};
+document.getElementById('gearT').oninput = e => {
+  const v = parseFloat(e.target.value);
+  document.getElementById('gearTV').textContent = v.toFixed(1) + 's';
+  document.getElementById('gearSpinAnim').setAttribute('dur', v + 's');
+};
+document.getElementById('btnMute').onclick = e => {
+  vid.muted = !vid.muted;
+  e.target.textContent = vid.muted ? '🔇 静音' : '🔊 有声';
+};
+addEventListener('keydown', e => {
+  if (e.code === 'Space'){ e.preventDefault(); togglePlay(); }
+  if (e.code === 'ArrowLeft'  && vid.paused){ vid.currentTime = Math.max(0, vid.currentTime - (e.shiftKey ? 0.5 : 1/60)); }
+  if (e.code === 'ArrowRight' && vid.paused){ vid.currentTime = Math.min(vid.duration || 12, vid.currentTime + (e.shiftKey ? 0.5 : 1/60)); }
+});
+addEventListener('resize', layout);
+
+/* ---------- 启动 ---------- */
+buildIndigo();
+applyBreath();
+document.getElementById('gearSpinAnim').setAttribute('begin', '-15.67s');   /* 实测齿轮初相 */
+document.getElementById('phaseV').textContent = '+' + ALIGN.P0.toFixed(3) + 's';
+setMode('side');
+svg.setCurrentTime(ALIGN.P0);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
