@@ -71,6 +71,9 @@
     <label data-page-node-id="vu0yXCGauQ6e5eFSr3ZnsL">Y</label><input type="range" id="adjY" min="-20" max="20" step="0.5" value="0" data-page-node-id="mohV4qT3gdDYv6IBXrE3Re"><b id="adjYV" data-page-node-id="VCQh78MAPnIwwyy7j3P5ul">0</b>
     <label data-page-node-id="Dd5VR1DuclyWYP8FVfRnKs">缩放</label><input type="range" id="adjS" min="0.92" max="1.08" step="0.002" value="1" data-page-node-id="KyPrqJ7jsSloufEurrj15c"><b id="adjSV" data-page-node-id="q0maxBWPn5qj8AvXzxFvlf">1.000</b>
   </div>
+  <div class="grp" data-page-node-id="CmpLidTgl78Qk2vXyP8mJ3cR1">
+    <label data-page-node-id="CmpLidTgl78Qk2vXyP8mJ3cR2"><input type="checkbox" id="showLid" data-page-node-id="CmpLidTgl78Qk2vXyP8mJ3cR3"> 闭眼眼睑</label>
+  </div>
   <div class="grp" data-page-node-id="86XhHW0wVBbxlSScojzEtF">
     <label data-page-node-id="wgpHG78vr9pLscjpQrtmuF">齿轮相位</label>
     <input type="range" id="gearPh" min="0" max="18.15" step="0.01" value="15.67" data-page-node-id="XiRrMzAjfUjUkZARTVZRyf">
@@ -237,12 +240,6 @@
     </g>
 
     <!-- 眨眼眼睑: 对比台固定 A 状态, 常隐藏 -->
-    <g id="stateB_lid_bot" style="display:none" data-page-node-id="ORG08MeBREyMJOtYeedEjO">
-      <path d="M 78.1 0 A 200 200 0 0 1 -78.1 0" fill="url(#gLid)" data-page-node-id="z7K2s8lGU2dEitlMvHugLo"/>
-    </g>
-    <g id="stateC_lid_bot" opacity="0" style="display:none" data-page-node-id="l3eLX2xLvOzF62bT5UYx1D">
-      <path d="M 78.1 0 A 200 200 0 0 1 -78.1 0" fill="url(#gLid)" data-page-node-id="Jo6wwRgQsSy3zDSZJ5MUJJ"/>
-    </g>
 
     <g id="scanWrap" clip-path="url(#clipCore)" opacity=".62" data-page-node-id="UUI0np5ibCkRoO74hvgQvF">
       <g id="scanG" data-page-node-id="zqlCPUcJb4FDLkhwIEVJfc">
@@ -254,11 +251,18 @@
 
     <circle r="100" fill="none" stroke="#BCC4F2" stroke-width="2.3" opacity=".85" data-page-node-id="Z24y419fFy5uAvZG91w1gO"/>
 
+    <!-- 闭眼帽檐 (2026-09-14 定稿, 与 fairy-lab 同源):
+         端点固定在齿轮基圆 (±77.69, -8) 不动, 只有弧的下垂深度按实测波形变化
+         (呼吸谷=眼睑最下, 露出白月牙最小; 与白环呼吸错开 +41.7ms, 见 applyBreath)。
+         ⚠️ <animate> 必须放在 <path> 内部 (SMIL 只作用于父元素)。 -->
     <g id="stateB_lid_top" style="display:none" data-page-node-id="aP5pnQstwejwScGy69mEwO">
-      <path d="M -78.1 0 A 78.1 78.1 0 0 1 78.1 0 L -78.1 0 Z" fill="url(#gLid)" data-page-node-id="PsDrpX3qpgusJ1ZtDD9Flr"/>
-    </g>
-    <g id="stateC_lid_top" opacity="0" style="display:none" data-page-node-id="E83uWu9Y0RqTLA38Wu8S27">
-      <path d="M -78.1 0 A 78.1 78.1 0 0 1 78.1 0 L -78.1 0 Z" fill="url(#gLid)" data-page-node-id="itcQXCSv6wC1uVlgYogy6H"/>
+      <path id="closedLidPath" d="M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z"
+            fill="url(#gLid)" data-page-node-id="PsDrpX3qpgusJ1ZtDD9Flr">
+        <animate id="closedLidMoveAnim" attributeName="d"
+                 values="M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 162.84 162.84 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 176.11 176.11 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 198.76 198.76 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 237.69 237.69 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 260.15 260.15 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 285.69 285.69 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 321.44 321.44 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 334.48 334.48 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 317.06 317.06 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 260.51 260.51 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 210.05 210.05 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 182.09 182.09 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 163.32 163.32 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z"
+                 keyTimes="0.00000;0.10833;0.14167;0.16667;0.21667;0.25833;0.34167;0.37500;0.41667;0.58333;0.64167;0.67500;0.72500;0.85000;1.00000" dur="0.852s" repeatCount="indefinite"
+                 data-page-node-id="CmpLdMv78Qk2vXyP8mJ3cR9"/>
+      </path>
     </g>
    </g>
   </g>
@@ -306,6 +310,13 @@ function applyBreath(){
   // 高光摆动与呼吸锁相 (实测), 只同步周期不缩放
   const sway = document.getElementById('glintSwayAnim');
   if (sway) sway.setAttribute('dur', T + 's');
+  // 闭眼帽檐: dur 同周期; begin = 白环(0.00) + 41.7ms 实测时差
+  // (互相关 r=0.94: 眼睑最下比白环最小晚 41.7ms, 与 fairy-lab 同一实测)
+  const lid = document.getElementById('closedLidMoveAnim');
+  if (lid){
+    lid.setAttribute('dur', T + 's');
+    lid.setAttribute('begin', '0.042s');
+  }
   for (const [id, amp, phase] of RINGS) {
     const el = document.getElementById(id);
     const a = amp;
@@ -477,6 +488,9 @@ addEventListener('resize', layout);
 buildIndigo();
 applyBreath();
 document.getElementById('gearSpinAnim').setAttribute('begin', '-15.67s');   /* 实测齿轮初相 */
+document.getElementById('showLid').addEventListener('change', e => {
+  document.getElementById('stateB_lid_top').style.display = e.target.checked ? '' : 'none';
+});
 document.getElementById('phaseV').textContent = '+' + ALIGN.P0.toFixed(3) + 's';
 setMode('side');
 svg.setCurrentTime(ALIGN.P0);

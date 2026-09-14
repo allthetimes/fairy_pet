@@ -279,21 +279,6 @@
             </g>
           </g>
 
-          <!-- B 状态: 长闭眼态的眼睑底弧 (跟随白环呼吸 ±4%)
-               用户 2026-09-13 反馈: "不是整体的放大, 只是下面随着变化" -->
-          <g id="stateB_lid_bot" style="display:none" data-page-node-id="L0dBotV2qP9cR1kJ">
-            <path d="M 78.1 0 A 200 200 0 0 1 -78.1 0" fill="url(#gLid)" data-page-node-id="p1H2c4L8dF5xR9mN7qJ3sT"/>
-          </g>
-
-          <!-- C 状态: 真眨眼的眼皮底弧 (与 B 同, 瞬时 1.07s) -->
-          <g id="stateC_lid_bot" opacity="0" style="display:none" data-page-node-id="C1dBotV2qP9cR2kK">
-            <animateTransform id="blinkLidBotAnim" attributeName="transform" type="translate"
-                              values="0 -140; 0 0; 0 -140"
-                              keyTimes="0; 0.31; 1"
-                              dur="1.07s" begin="indefinite" fill="remove"
-                              data-page-node-id="a1n2I3m4T5r6a7n8s9f0o1r2m"/>
-            <path d="M 78.1 0 A 200 200 0 0 1 -78.1 0" fill="url(#gLid)" data-page-node-id="p2H3c4L8dF5xR9mN7qJ4sU"/>
-          </g>
 
           <!-- 表面扫描线：SMIL 平移，位移量 = 图案周期，无缝滚动 -->
           <g id="scanWrap" clip-path="url(#clipCore)" opacity=".62" data-page-node-id="bej9WSpA7LxnY3rAJG2tFj">
@@ -307,19 +292,22 @@
           <!-- 最外细白描边 (不动) -->
           <circle r="100" fill="none" stroke="#BCC4F2" stroke-width="2.3" opacity=".85" data-page-node-id="gDXnfWOTEDhoylweM60D1z"/>
 
-          <!-- B 状态: 长闭眼态的眼睑顶弧 (固定不动) -->
+          <!-- B 状态: 闭眼帽檐 (2026-09-14 10:58 定稿: 端点固定, 只有弧的下垂深度在变)
+               底缘弧的两个端点固定在齿轮基圆 (±78.1, 0) **不动**,
+               中点(下垂深度 bot)按视频实测波形在 1.15 ↔ 12.48 SVG 之间往复 ——
+               呼吸收缩到最小(谷)时眼睑压到最低, 露出的白环最少。
+               上半圆 A 78.1 78.1 也因此恒贴合基圆, "上面静止"自动成立。
+               数据: scripts/closed_lid_track.py 逐帧实测 → closed_lid_fit.py 折叠成关键帧。
+               ⚠️⚠️ <animate> 必须放在 <path> **内部**(SMIL 只作用于父元素) ——
+               之前放在 <g> 里导致 d 动画静默失效, 还误判成"Chrome 圆弧补间不可靠"。 -->
           <g id="stateB_lid_top" style="display:none" data-page-node-id="L0dTopV2qP9cR1kJ">
-            <path d="M -78.1 0 A 78.1 78.1 0 0 1 78.1 0 L -78.1 0 Z" fill="url(#gLid)" data-page-node-id="p1H2c4L8dF5xR9mN7qJ3sT"/>
-          </g>
-
-          <!-- C 状态: 真眨眼眼皮顶弧 (与 B 同位置, 瞬时动画) -->
-          <g id="stateC_lid_top" opacity="0" style="display:none" data-page-node-id="C1dTopV2qP9cR2kK">
-            <animateTransform id="blinkLidTopAnim" attributeName="transform" type="translate"
-                              values="0 -140; 0 0; 0 -140"
-                              keyTimes="0; 0.31; 1"
-                              dur="1.07s" begin="indefinite" fill="remove"
-                              data-page-node-id="a1n2I3m4T5r6a7n8s9f0o1r2m"/>
-            <path d="M -78.1 0 A 78.1 78.1 0 0 1 78.1 0 L -78.1 0 Z" fill="url(#gLid)" data-page-node-id="p2H3c4L8dF5xR9mN7qJ4sU"/>
+            <path id="closedLidPath" d="M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z"
+                  fill="url(#gLid)" data-page-node-id="p1H2c4L8dF5xR9mN7qJ3sT">
+              <animate id="closedLidMoveAnim" attributeName="d"
+                       values="M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 162.84 162.84 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 176.11 176.11 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 198.76 198.76 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 237.69 237.69 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 260.15 260.15 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 285.69 285.69 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 321.44 321.44 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 334.48 334.48 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 317.06 317.06 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 260.51 260.51 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 210.05 210.05 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 182.09 182.09 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 163.32 163.32 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z"
+                       keyTimes="0.00000;0.10833;0.14167;0.16667;0.21667;0.25833;0.34167;0.37500;0.41667;0.58333;0.64167;0.67500;0.72500;0.85000;1.00000" dur="0.852s" repeatCount="indefinite"
+                       data-page-node-id="LdMv78Qk2vXyP8mJ3cR9"/>
+            </path>
           </g>
          </g>
         </g>
@@ -532,6 +520,18 @@ function applyBreath(){
   // 高光摆动与呼吸锁相 (实测), 只同步周期不缩放
   const sway = document.getElementById('glintSwayAnim');
   if (sway) sway.setAttribute('dur', T + 's');
+  // 闭眼帽檐与呼吸锁相 (2026-09-14 11:40 用户指出"眼睑最下 ↔ 通孔收缩到最小, 这是同时的"):
+  // ① dur 与呼吸环一致;
+  // ② begin 对齐 —— 各呼吸环有 0~96ms 的 begin 阶梯 (内环最先动), 帽檐若 begin=0
+  //    就会与白环错开 96ms。实测互相关 (r=0.94): 原视频里眼睑最下比白环最小
+  //    **晚 41.7ms** ⇒ 帽檐 begin = 白环 begin + 0.042。
+  const lid = document.getElementById('closedLidMoveAnim');
+  if (lid){
+    lid.setAttribute('dur', T + 's');
+    const WHITE_DELAY = 0.096;   // = RINGS 表里 whitePulseAnim 的 delay
+    const LID_LAG     = 0.042;   // 实测互相关峰值 (-5 帧 @120fps)
+    lid.setAttribute('begin', (WHITE_DELAY + LID_LAG).toFixed(3) + 's');
+  }
   for (const [id, amp, delay] of RINGS) {
     const el = document.getElementById(id);
     if (!el) continue;
@@ -569,38 +569,17 @@ function setRates(talking){
   document.getElementById('scanAnim').setAttribute('dur', talking ? '.22s' : '.5s');
 }
 function setLidB(on){
-  // 长闭眼态: 显示顶弧+底弧
+  // 闭眼帽檐只有一个图层: 外缘贴合齿轮基圆, 底缘按实测轨迹走。
+  // (旧的 stateB_lid_bot「半径200的固定弧」已删除 —— 它最深到 y=15.9,
+  //  会比实测底缘 y=2.4~11.3 多露出一圈深色。)
   document.getElementById('stateB_lid_top').style.display = on ? '' : 'none';
-  document.getElementById('stateB_lid_bot').style.display = on ? '' : 'none';
-}
-function triggerRealBlink(){
-  // 真眨眼: 顶弧+底弧同时从顶部落下再抬起
-  const top = document.getElementById('stateC_lid_top');
-  const bot = document.getElementById('stateC_lid_bot');
-  top.style.display = ''; top.setAttribute('opacity', '1');
-  bot.style.display = ''; bot.setAttribute('opacity', '1');
-  document.getElementById('blinkLidTopAnim').beginElement();
-  document.getElementById('blinkLidBotAnim').beginElement();
-  setTimeout(() => {
-    top.setAttribute('opacity', '0');
-    bot.setAttribute('opacity', '0');
-    setTimeout(() => { top.style.display = 'none'; bot.style.display = 'none'; }, 50);
-  }, 1100);
 }
 function setState(s){
   pet.classList.remove('talking','glitch','clicked');
   setLidB(s === 'closed');
-  if (s === 'blink'){
-    triggerRealBlink();
-    setTimeout(() => setState('idle'), 1100);
-    return;
-  }
   if (s === 'glitch'){
     pet.classList.add('glitch');
-    setTimeout(() => {
-      pet.classList.remove('glitch');
-      setState('idle');
-    }, 600);
+    setTimeout(() => { pet.classList.remove('glitch'); setState('idle'); }, 600);
     cur = 'idle';
     document.querySelectorAll('#states button').forEach(b =>
       b.classList.toggle('on', b.dataset.st === 'idle'));
@@ -612,19 +591,14 @@ function setState(s){
   document.querySelectorAll('#states button').forEach(b =>
     b.classList.toggle('on', b.dataset.st === s));
 }
-function blink(){ setState('blink'); }   // 兼容旧 API (双击触发)
 
 document.getElementById('states').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   setState(b.dataset.st);
 });
 pet.addEventListener('click', () => {
-  pet.classList.remove('clicked'); void pet.offsetWidth;
-  pet.classList.add('clicked');
-  setTimeout(() => pet.classList.remove('clicked'), 440);
+  setState(cur === 'closed' ? 'idle' : 'closed');
 });
-pet.addEventListener('dblclick', blink);
-setInterval(() => { if (cur === 'idle' && Math.random() < 0.5) blink(); }, 4200);
 
 /* ============ 4. 动效开关 ============ */
 document.getElementById('toggleGear').onclick = e => {
@@ -714,16 +688,10 @@ function setupBare(){
   if (q.has('tip'))  P.tip  = parseFloat(q.get('tip'));
   if (q.has('half')) P.half = parseFloat(q.get('half'));
   if (q.has('tip') || q.has('half')) buildIndigo();
-  if (q.has('autoblink')) {                                // 测试钩子：延时触发一次真眨眼
-    svg.setCurrentTime(0);
-    setTimeout(() => {
-      document.getElementById('blinkLidTopAnim').beginElement();
-      document.getElementById('blinkLidBotAnim').beginElement();
-    }, parseFloat(q.get('autoblink')));
-  } else {
-    svg.pauseAnimations();                                 // 确定性：先冻结
-    svg.setCurrentTime(q.has('freeze') ? parseFloat(q.get('freeze')) : 0);
-  }
+  // ?lid=1 直接以闭眼态出裸图, 配合 ?freeze=t 可定格到周期的任意时刻核验底缘
+  if (q.has('lid')) setLidB(true);
+  svg.pauseAnimations();                                 // 确定性：先冻结
+  svg.setCurrentTime(q.has('freeze') ? parseFloat(q.get('freeze')) : 0);
 }
 
 /* ============ 8. 收尾 ============ */
