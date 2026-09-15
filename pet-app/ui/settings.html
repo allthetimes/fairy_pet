@@ -102,9 +102,9 @@
 
 <div id="tab-pVoice" class="tab-page" style="display:none" data-page-node-id="Sf377eezya8NJv6mTBpcHs">
   <div class="grp" data-page-node-id="RQ2oeK85JQeHGSp8CzeQtJ">
-    <h2 data-page-node-id="BRhcHDGAOR8KDY4dHC9GyM">语音（豆包语音合成）</h2>
+    <h2 data-page-node-id="BRhcHDGAOR8KDY4dHC9GyM">语音（在线 TTS）</h2>
     <div class="row" data-page-node-id="AQzIKEx9E2hR5P1RVWlpoo"><span data-page-node-id="WNS3MQSFYnYcZ3p9oO3iQT">语音开关</span><button id="btnVoice" data-page-node-id="jDcS9paBWhhJOmWTUkw6WE">开</button></div>
-    <label class="ti" data-page-node-id="DVan8wBF8sYBzt7bcRXqWT"><span data-page-node-id="LiBVUijFEhfBa2dJJaaOqE">API Key</span><input type="password" id="doubaoApiKey" placeholder="火山控制台 data-page-node-id="LU2bRjJejlcpvymkJahHTh" > API Key 管理（只存本机）"></label>
+    <label class="ti" data-page-node-id="DVan8wBF8sYBzt7bcRXqWT"><span data-page-node-id="LiBVUijFEhfBa2dJJaaOqE">API Key</span><input type="password" id="doubaoApiKey" placeholder="服务商控制台获取（只存本机）"></label>
     <label class="ti" data-page-node-id="PLmNVGC8JpCGbHgxMiqSCK"><span data-page-node-id="vj2JhMsx8uznDjrAYfkqnW">资源 ID</span><select id="doubaoResourceId" data-page-node-id="RtnjjKNGAMO7mEKF5oCnMv">
       <option value="seed-tts-2.0" data-page-node-id="n7EVqGXHfILyyo3fIC7DRX">seed-tts-2.0（音色库音色）</option>
       <option value="seed-icl-2.0" data-page-node-id="iTyZbPGFiNFj8GT8SokqvO">seed-icl-2.0（声音复刻音色）</option>
@@ -114,7 +114,7 @@
     <label class="sl" data-page-node-id="YoEoou67M1s1eh2sioYp4u"><span data-page-node-id="dsB4cCNgmVNXxQCXHIJ6G8">语音音量</span><input type="range" id="pVoiceVol" min="0" max="100" step="5" value="80" data-page-node-id="bAqk5jKBEoSdt4vP2BmdoV"><b id="vVoiceVol" data-page-node-id="UiU5LEPgifD3r7k9E0KQrw">80</b></label>
     <div class="row" style="align-items:center;gap:8px" data-page-node-id="HcdyUi1D3t8Kd5b15hIck7"><span style="font-size:12px;color:var(--dim);white-space:nowrap" data-page-node-id="GbDbV5MHS950UDrR9dnw79">测试文本</span><input type="text" id="ttsTestText" value="你好，主人，语音模块测试成功。" style="flex:1" data-page-node-id="6hQQ0YTGdpDcJP2K4I2m3C"><button id="btnTestTts" data-page-node-id="6Fiv6cXmCF81OGFnmZFNQ8">▶ 实时试听</button></div>
     <div class="row" data-page-node-id="DsqhYq9FtU7YrN0lEun9TO"><span id="ttsTestStatus" style="font-size:11px;color:var(--dim)" data-page-node-id="BbuOHypUFVkdj5gXryQdOB"></span></div>
-    <div class="note" data-page-node-id="tBCaYlmhSPwtpCOvcXdvIt">需在火山引擎开通「豆包语音合成大模型」并获取密钥；密钥只保存在本机配置文件。
+    <div class="note" data-page-node-id="tBCaYlmhSPwtpCOvcXdvIt">需自行开通在线 TTS 服务并获取密钥；密钥只保存在本机配置文件。
     用声音复刻音色时，资源 ID 选 seed-icl-2.0，音色 ID 填复刻生成的 ID。
     <b data-page-node-id="cF7yXHAYiwGc8NTUcGnblH">语音开关关闭后完全不调用合成接口</b>（不消耗额度），只显示文字气泡。
     开启语音时桌宠会闭眼说话，说完恢复。</div>
@@ -145,16 +145,16 @@
     </div>
     <div class="note" data-page-node-id="BI4zrXdecXDH6MLbXEpytd">
       本应用是 Fairy 2.6+ 形象的桌面化复刻——环形核会呼吸、齿轮会转，点击可以让她闭眼，
-      接入豆包语音合成后还能用她的声音说话。台词语气对照游戏内 H.D.D. 待机语音：
+      接入在线 TTS 服务后还能用她的声音说话。台词语气对照游戏内 H.D.D. 待机语音：
       毒舌、傲娇、自恋，嘴上嫌弃你，但一直默默帮你。
     </div>
   </div>
   <div class="grp" data-page-node-id="lKxnZF3I1EINuovKxAMmuU">
     <h2 data-page-node-id="AUtwef1xQc4MS2wlA9v3Mh">版本</h2>
     <div class="kv" data-page-node-id="AcXwTidS6Q7uj87EKnvyv6"><span data-page-node-id="SyqVKb9DMGp04uBOAjkt05">桌宠版本</span><span data-page-node-id="5Xn6ls61ulFJCG2lyGNBrs">v0.2.0（Electron）</span></div>
-    <div class="kv" data-page-node-id="els6mGQYSYguAhk9n7w7aC"><span data-page-node-id="F2uUIkPG5yXHUJrrYXCROv">语音引擎</span><span data-page-node-id="5qlNF0JBAXBtZZ6dmUlvAF">豆包语音合成大模型（运行时 TTS）</span></div>
+    <div class="kv" data-page-node-id="els6mGQYSYguAhk9n7w7aC"><span data-page-node-id="F2uUIkPG5yXHUJrrYXCROv">语音引擎</span><span data-page-node-id="5qlNF0JBAXBtZZ6dmUlvAF">就不在这里点名啦</span></div>
     <div class="kv" data-page-node-id="3ZPH0BjYMuQIyEF9nLxA7Z"><span data-page-node-id="X40GEuFKNmAE4qFSdbAqmK">动画内核</span><span data-page-node-id="wZAhDoDG3Dki0WP0Qc55cO">SVG 程序化复刻（fairy-lab 校准参数）</span></div>
-    <div class="note" data-page-node-id="U1rTHVPITbWHlAAqfeXFK6">想要 Fairy 的原声？在火山引擎用「声音复刻」克隆音色后，把复刻音色 ID 填入语音页即可。</div>
+    <div class="note" data-page-node-id="U1rTHVPITbWHlAAqfeXFK6">至于她的声音——思路是通用的：现成的音色克隆方案，配上一段合适的参考音频，得到音色 ID 后填进语音页就好。具体就不在这里展开啦。</div>
   </div>
 </div>
 

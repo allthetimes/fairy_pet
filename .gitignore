@@ -8,6 +8,16 @@ reference/
 generated-images/
 dev/*.mp4
 
+# 版权敏感素材（游戏视频帧截图 / B站音频扒取）：只留本地，不入库
+_dbg.png
+dev/**/*.png
+dev/**/*.mp3
+dev/**/*.m4a
+dev/**/*.wav
+
+# 运行时 TTS 语音缓存（个人 API 产物，只留本机）
+pet-app/voice-cache/
+
 # Python
 __pycache__/
 *.pyc
