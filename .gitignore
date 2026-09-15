@@ -21,3 +21,6 @@ pet-app/node_modules/
 pet-app/release/
 pet-app/.measure/
 pet-app/*.log
+
+# IDE
+.idea/

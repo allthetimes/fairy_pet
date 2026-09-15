@@ -570,14 +570,10 @@ function sayText(text, kind){
     else maybeHide();                          // 有语音：等播完（onended 回调里关）
   }
   if (kind && CFG.voiceOn && petAPI){
-    const cap = setTimeout(() => { voiceEnded = true; maybeHide(); }, 30000);
-    petAPI.ttsSpeak(text, kind).then(url => {
+    const cap = setTimeout(() => { voiceEnded = true; maybeHide(); }, 30000);   // 语音迟迟不来的兜底
+    playVoiceSegments(text, kind).then(() => {
       clearTimeout(cap);
-      if (url){
-        playVoiceUrl(url, () => { voiceEnded = true; maybeHide(); });   // 语音结束 → 关气泡
-      } else {
-        voiceEnded = true; maybeHide();       // 合成失败 → 按无语音处理
-      }
+      voiceEnded = true; maybeHide();        // 语音结束 → 关气泡
     }).catch(() => { clearTimeout(cap); voiceEnded = true; maybeHide(); });
   } else {
     console.warn(`[voice] 跳过语音: kind=${kind} voiceOn=${CFG.voiceOn} petAPI=${!!petAPI}`);
@@ -612,24 +608,57 @@ function clampBubble(){
    打字先走、声音后到（CPU 合成需要几秒~几十秒）；缓存后同一句秒开。
    任何失败静默回退纯文字。 */
 var currentVoice = null;
+let eyeStateBeforeVoice = null;    // 说话前的眼睛状态（null=不在语音中）——说完恢复
 function voiceStopFx(){
   petEl.classList.remove('talking');
   setRates(false);
 }
-function playVoiceUrl(url, onEnded){
+function playVoiceUrl(url){
+  // 返回 Promise：音频播完（或失败）时 resolve——talking 态与眼睛由语音序列统一管理
+  return new Promise(res => {
+    try {
+      if (currentVoice){ try { currentVoice.onended = null; currentVoice.pause(); } catch(e){} currentVoice = null; }
+      const a = new Audio(url);
+      currentVoice = a;
+      a.volume = Math.min(1, Math.max(0, (CFG.voiceVolume ?? 80) / 100));
+      let done = false;
+      const finish = () => { if (!done){ done = true; res(); } };
+      a.onended = finish;
+      a.onplaying = () => console.warn(`[voice] 开始播放: ${url}`);
+      a.onerror = () => { console.warn(`[voice] 音频加载失败: ${url}`); finish(); };   // 播放失败不影响文字
+      a.play().catch(err => { console.warn(`[voice] play() 被拒: ${err.message}`); finish(); });
+    } catch (e) { res(); }
+  });
+}
+
+/* ── 按 …… 切段工具（语音队列用）── */
+const VOICE_PAUSE_MS = 1000;                 // …… 的停顿时长
+function sleepMs(ms){ return new Promise(r => setTimeout(r, ms)); }
+function splitVoiceSegments(text){
+  return text.split(/…+/).map(t => t.trim()).filter(Boolean);
+}
+
+/* ── 语音序列：说话时闭眼（用户 09-15 要求），说完恢复之前的状态 ──
+   按 …… 切段逐段播放（豆包 2.0 音色不支持 SSML break，这是唯一能控制节奏的方式），
+   talking 态（齿轮加速+亮度）与闭眼贯穿整个序列（含段间 1s 停顿），结束时统一恢复。 */
+async function playVoiceSegments(text, kind){
+  const segs = splitVoiceSegments(text);
+  if (eyeStateBeforeVoice === null) eyeStateBeforeVoice = (cur === 'closed');
+  setLidB(true);                           // 说话 → 闭眼
+  petEl.classList.add('talking');
+  setRates(true);
   try {
-    if (currentVoice){ try { currentVoice.onended = null; currentVoice.pause(); } catch(e){} currentVoice = null; voiceStopFx(); }
-    const a = new Audio(url);
-    currentVoice = a;
-    a.volume = Math.min(1, Math.max(0, (CFG.voiceVolume ?? 80) / 100));
-    a.onended = () => { voiceStopFx(); if (onEnded) onEnded(); };   // 播完退出 talking 态 + 通知气泡关闭
-    a.onplaying = () => console.warn(`[voice] 开始播放: ${url}`);
-    a.onerror = () => console.warn(`[voice] 音频加载失败: ${url}`);   // 播放失败不影响文字
-    a.play().then(() => {
-      petEl.classList.add('talking');        // 说话态：齿轮加速 + 亮度提升
-      setRates(true);
-    }).catch(err => console.warn(`[voice] play() 被拒: ${err.message}`));
-  } catch (e) { /* ignore */ }
+    for (let i = 0; i < segs.length; i++){
+      let url = '';
+      try { url = await petAPI.ttsSpeak(segs[i], kind); } catch(e){}
+      if (url) await playVoiceUrl(url);    // 播完这段才继续
+      if (i < segs.length - 1) await sleepMs(VOICE_PAUSE_MS);   // …… 停顿（眼睛保持闭着）
+    }
+  } finally {
+    voiceStopFx();                         // 退出 talking 态
+    setLidB(eyeStateBeforeVoice === true); // 恢复说话前的眼睛状态
+    eyeStateBeforeVoice = null;
+  }
 }
 
 const FALLBACK = {

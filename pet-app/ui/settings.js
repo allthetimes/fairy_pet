@@ -145,6 +145,12 @@ document.getElementById('btnReset').addEventListener('click', async () => {
 document.getElementById('btnHide').addEventListener('click', () => api.toggle());
 document.getElementById('btnQuit').addEventListener('click', () => api.quit());
 
+/* ---- 栏目页签 ---- */
+document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.tab-page').forEach(pg => pg.style.display = (pg.id === 'tab-' + b.dataset.tab) ? 'block' : 'none');
+}));
+
 /* 初始化 */
 api.getConfig().then(c => {
   cfg = { ...DEF, ...c }; refreshUI();

@@ -1,6 +1,6 @@
 {
   "name": "fairy-pet",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Fairy 桌宠（Electron · 环形核 SVG 复刻）",
   "author": "allthetimes",
   "main": "src/main.js",
