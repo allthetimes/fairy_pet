@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>FairyPet</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:transparent;overflow:hidden;
+            font:13px/1.6 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+  /* 布局: 内容贴底居中，上方空间留给台词气泡 */
+  body{
+    --s:1;                                   /* 缩放系数，由 JS 写入 */
+    display:flex; align-items:flex-end; justify-content:center;
+    padding-bottom:calc(30px * var(--s));
+    -webkit-user-select:none; user-select:none;
+  }
+
+  /* 桌宠容器：透明底；尺寸由内部 SVG 决定 */
+  .pet{position:relative; cursor:grab; -webkit-user-select:none; user-select:none}
+  .pet:active{cursor:grabbing}
+  /* SVG 允许溢出：辉光 r=135 超出 viewBox ±120，不裁切 */
+  #svg{overflow:visible; display:block}
+
+  .float{animation:float 3.4s ease-in-out infinite; will-change:transform; transition:filter .3s}
+  @keyframes float{
+    0%,100%{transform:translateY(-4px) scale(1)}
+    50%    {transform:translateY(4px)  scale(1.012)}
+  }
+  .pet.talking .float{filter:brightness(1.16) saturate(1.08)}
+  .pet:hover .float{filter:brightness(1.15)}
+  .pet.clicked .float{animation:clickpunch .42s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes clickpunch{
+    0%{transform:scale(1)} 35%{transform:scale(.92)} 70%{transform:scale(1.045)} 100%{transform:scale(1)}
+  }
+  .pet.glitch .core{animation:rgbsep .3s steps(2) infinite}
+  @keyframes rgbsep{
+    0%{filter:none}
+    33%{filter:drop-shadow(-3px 0 0 rgba(255,60,60,.55)) drop-shadow(3px 0 0 rgba(60,255,220,.5))}
+    66%{filter:drop-shadow(2px 0 0 rgba(255,60,60,.4))}
+  }
+
+  /* ---- 台词气泡（临时样式：等游戏内截图/视频后再仿照重做） ---- */
+  .bubble{
+    position:absolute;
+    left:50%; bottom:100%;                   /* 贴在圆盘上方 */
+    margin-bottom:calc(-14px * var(--s));    /* 略压住圆盘顶部 */
+    transform:translateX(-50%);
+    /* ⚠️ 必须显式 width:max-content：abspos + left:50% 的收缩宽度受
+       "left 之后剩余空间"(=200px) 限制，单写 max-width 永远不生效（实测踩坑） */
+    width:max-content;
+    max-width:min(calc(440px * var(--s)), calc(100vw - 24px));   /* 320→440: 每行多装 ~40% 字（用户 09-15 反馈） */
+    min-width:calc(80px * var(--s));
+    padding:calc(9px * var(--s)) calc(14px * var(--s));
+    background:rgba(16,20,44,.9);
+    border:1px solid rgba(96,150,255,.55);
+    border-radius:calc(12px * var(--s));
+    color:#dbe3f5;
+    font-size:max(11px, calc(13px * var(--s)));
+    line-height:1.6;
+    box-shadow:0 4px 24px rgba(20,40,120,.35);
+    opacity:0; transition:opacity .28s;
+    pointer-events:none;                     /* 不挡鼠标：气泡期间仍可拖拽/点击 */
+    word-break:break-word;
+  }
+  .bubble.show{opacity:1}
+  .bubble .caret{display:inline-block;width:2px;height:1em;margin-left:1px;
+                 background:#7fa8ff;vertical-align:-2px;animation:caret .8s step-end infinite}
+  @keyframes caret{50%{opacity:0}}
+</style>
+</head>
+<body>
+<div class="pet" id="pet">
+  <div class="bubble" id="bubble"><span id="bubbleText"></span><span class="caret" id="bubbleCaret"></span></div>
+  <div class="float">
+    <svg id="svg" width="400" height="400" viewBox="-120 -120 240 240">
+      <defs data-page-node-id="3ElRxLHevooqvIT83thDoD">
+          <!-- 各层径向渐变：offset 按实测半径归一化，颜色按避开高光扇区的采样校准 -->
+          <radialGradient id="gOuterBlue" cx="50%" cy="50%" r="50%" data-page-node-id="D9veCLVEvotv4GggHuMzJJ">
+            <stop offset="78.1%" stop-color="#2D3DD0" data-page-node-id="o1jKX6tEEvEupyxHURnnHh"/>
+            <stop offset="84%"   stop-color="#2E3FD8" data-page-node-id="wdtWqpdD95DVDYgQyM4HwE"/>
+            <stop offset="92%"   stop-color="#3145E6" data-page-node-id="j8AFf1I6LROomOOstQpMaW"/>
+            <stop offset="100%"  stop-color="#3549EC" data-page-node-id="d4WrL01ZFWigeuuJFPzuTs"/>
+          </radialGradient>
+          <!-- 靛蓝环带+尖齿共用一条径向渐变。
+               必须用 userSpaceOnUse：path 的包围盒含尖齿(r=91.7)，
+               用 objectBoundingBox 会让渐变比例整体失准。
+               各 stop 颜色为实测：尖齿中心(213.5°)与环带中段(170°/258°)
+               在同一半径上颜色一致（色差≤13，属噪声），证明二者本是同一几何体。 -->
+          <!-- 靛蓝环带+尖齿共用一条径向渐变。
+               必须用 userSpaceOnUse：path 的包围盒含尖齿(r=91.7)，
+               用 objectBoundingBox 会让渐变比例整体失准。
+               环带可见区 62.2-78.1u (66.9-84%) 的 stops 按 2.6 视频实测重写
+               (2026-09-13 用户反馈: 白环外缘与齿轮间有一圈"白色高光"，原版没有——
+                旧值 69.4% #4E5FA6 L98 在白环外形成亮带, 原版同区 L63→42 平滑衰减;
+                8 方向 RGB: 62u(53,52,147) 64u(46,46,132) 66u(41,39,120)
+                70u(33,30,117) 74u(28,27,119) 76u(32,32,125)), 颜色 +4% 补偿扫描线;
+               84% 起为尖齿区, 维持立绘实测（尖齿与环带同一几何体） -->
+          <radialGradient id="gIndigo" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="93" data-page-node-id="yXj7YnWM9yH5XfmXZFgfAc">
+            <stop offset="66.9%" stop-color="#373699" data-page-node-id="zKp6w5agcNIdbwzplHydpb"/>
+            <stop offset="68.8%" stop-color="#303089" data-page-node-id="TKDtXhPIc2P88SONw3NdUv"/>
+            <stop offset="71.0%" stop-color="#2B297D" data-page-node-id="8gvEDbppUtjdfzCBQRleij"/>
+            <stop offset="75.3%" stop-color="#221F7A" data-page-node-id="CEx94KlbzOpvSVlkj9m7bc"/>
+            <stop offset="79.6%" stop-color="#1D1C7C" data-page-node-id="Nw52tY8uH3vB7kJ1fR6qXz"/>
+            <stop offset="81.7%" stop-color="#212182" data-page-node-id="Pv29wK5mE8xT4hN7dJ3sQa"/>
+            <stop offset="84.0%" stop-color="#212382" data-page-node-id="Kt63rZ9nW2yU5eG8cB1vMh"/>
+            <stop offset="92.5%" stop-color="#1D208A" data-page-node-id="JNIM4ghVVSZNO6ZzRvkwjF"/>
+            <stop offset="96.8%" stop-color="#1A2094" data-page-node-id="Urb42JfUWTB0JWnCX7gGXa"/>
+            <stop offset="100%"  stop-color="#17209C" data-page-node-id="UtaFskQtkoimwzPChRkaOT"/>
+          </radialGradient>
+          <radialGradient id="gWhite" cx="50%" cy="50%" r="50%" data-page-node-id="HkAtbr3UpUMzsMr91BnP5G">
+            <stop offset="69.3%" stop-color="#DEDAE3" data-page-node-id="CFD7ZnS8T0q2qHIuDavvwm"/>
+            <stop offset="100%"  stop-color="#D7D3DC" data-page-node-id="6ZGiXqpjWclkPFcE6oFMzF"/>
+          </radialGradient>
+          <radialGradient id="gSlate" cx="50%" cy="50%" r="50%" data-page-node-id="9cA33zDW2iiVSR5s7Qqdnk">
+            <stop offset="68.5%" stop-color="#848FC8" data-page-node-id="uqg1B0o7vG5IhRqYEBPeMw"/>
+            <stop offset="100%"  stop-color="#8995CB" data-page-node-id="WjObvyPDqDG6bHbWn545zh"/>
+          </radialGradient>
+          <radialGradient id="gMidBlue" cx="50%" cy="50%" r="50%" data-page-node-id="ucuvtRF4Gxaw3g0zvJGVg6">
+            <stop offset="0%"    stop-color="#2A4FA6" data-page-node-id="QNkxtGfla2qzkpWEZcdLXu"/>
+            <stop offset="70%"   stop-color="#2C57B4" data-page-node-id="Z2oyUP7vFyHQVhCTSx1XEc"/>
+            <stop offset="82%"   stop-color="#2D62C0" data-page-node-id="FQ16xVYFTM0a5Prch60gZO"/>
+            <stop offset="100%"  stop-color="#6183C6" data-page-node-id="h7U3UJkwpad0BYLQhGQduP"/>
+          </radialGradient>
+          <radialGradient id="gPupil" cx="50%" cy="50%" r="50%" data-page-node-id="FsH0Rg6DFECUAothqGqD2b">
+            <stop offset="0%"   stop-color="#2C4684" data-page-node-id="h5128POhcMUPIx7XNsxE7Y"/>
+            <stop offset="80%"  stop-color="#2D4585" data-page-node-id="muuj7Ua9t4jDMsvJ8EL6aM"/>
+            <stop offset="100%" stop-color="#2C4A8D" data-page-node-id="HzWEBX2DNaKqeZncCOY7hO"/>
+          </radialGradient>
+          <!-- 外部辉光：亮环落在核心边缘(r=100 处 = 135 的 74%) -->
+          <radialGradient id="gGlow" cx="50%" cy="50%" r="50%" data-page-node-id="kHcUDMURCV7ZOTqiU0Yjc6">
+            <stop offset="0%"   stop-color="rgba(74,126,255,0)" data-page-node-id="ZvlzRJDsj9SN9LH2H6vxam"/>
+            <stop offset="64%"  stop-color="rgba(62,110,255,.10)" data-page-node-id="HFSAqDWMljH9C8Hb1LROzn"/>
+            <stop offset="74%"  stop-color="rgba(92,146,255,.62)" data-page-node-id="JfH29QxYT9bi19vqKNwW4F"/>
+            <stop offset="84%"  stop-color="rgba(74,126,255,.26)" data-page-node-id="K8E4hETBVI07hPr9u2QoVd"/>
+            <stop offset="100%" stop-color="rgba(74,126,255,0)" data-page-node-id="HwjIx5N2kL18ABin09AWtB"/>
+          </radialGradient>
+          <radialGradient id="gGlint" cx="50%" cy="50%" r="50%" data-page-node-id="20fIB3XNPHc0bwdIqDTZnR">
+            <!-- 2026-09-13 霍夫拟合实测: 实心锐边圆盘 r≈14.1u, 无渐变尾(角向平均假象), 仅留0.5u抗锯齿羽化 -->
+            <stop offset="0%"   stop-color="#DBDBEB" data-page-node-id="p6fq1DBFUe132uFrPyEBXv"/>
+            <stop offset="96%"  stop-color="#DBDBEB" data-page-node-id="Zy7rCVlOaRjaP8yhxy09IG"/>
+            <stop offset="100%" stop-color="#DBDBEB" stop-opacity="0" data-page-node-id="eHpkT218UiX1BYiUqPKerV"/>
+          </radialGradient>
+          <pattern id="scanlines" width="4" height="2.2" patternUnits="userSpaceOnUse" data-page-node-id="y3khxd4bpSFhgDjBueO6Cl">
+            <rect width="4" height="1.1" fill="#000" opacity=".105" data-page-node-id="lxBlwuIZybCVOApQ27z9Rp"/>
+          </pattern>
+          <clipPath id="clipCore" data-page-node-id="Sb188hWMLAAFQyGy19bwkA"><circle r="100" data-page-node-id="aOXhX8oL2Rs2zsJ9tHjHK5"/></clipPath>
+          <!-- 上眼睑填充色: 与靛蓝层同色系 #1E2080, 外圈饱和度更高一点 -->
+          <radialGradient id="gLid" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="100" data-page-node-id="Yg6r5kLpN8fR2xLr3J7m9Z">
+            <stop offset="0%"    stop-color="#1B1F88" data-page-node-id="bOqT2c3L1yHpYrF4dJ6v0R"/>
+            <stop offset="80%"   stop-color="#1E2080" data-page-node-id="cKnX5m8W3zPt9yLq2H4dF7"/>
+            <stop offset="100%"  stop-color="#17209C" data-page-node-id="dWjR7q1L6kFs2nBv8M3xYp"/>
+          </radialGradient>
+        </defs>
+
+      <!-- 外部辉光：亮环落在核心边缘(r=100 处 = 135 的 74%) -->
+          <radialGradient id="gGlow" cx="50%" cy="50%" r="50%" data-page-node-id="kHcUDMURCV7ZOTqiU0Yjc6">
+            <stop offset="0%"   stop-color="rgba(74,126,255,0)" data-page-node-id="ZvlzRJDsj9SN9LH2H6vxam"/>
+            <stop offset="64%"  stop-color="rgba(62,110,255,.10)" data-page-node-id="HFSAqDWMljH9C8Hb1LROzn"/>
+            <stop offset="74%"  stop-color="rgba(92,146,255,.62)" data-page-node-id="JfH29QxYT9bi19vqKNwW4F"/>
+            <stop offset="84%"  stop-color="rgba(74,126,255,.26)" data-page-node-id="K8E4hETBVI07hPr9u2QoVd"/>
+            <stop offset="100%" stop-color="rgba(74,126,255,0)" data-page-node-id="HwjIx5N2kL18ABin09AWtB"/>
+          </radialGradient>
+          <radialGradient id="gGlint" cx="50%" cy="50%" r="50%" data-page-node-id="20fIB3XNPHc0bwdIqDTZnR">
+            <!-- 2026-09-13 霍夫拟合实测: 实心锐边圆盘 r≈14.1u, 无渐变尾(角向平均假象), 仅留0.5u抗锯齿羽化 -->
+            <stop offset="0%"   stop-color="#DBDBEB" data-page-node-id="p6fq1DBFUe132uFrPyEBXv"/>
+            <stop offset="96%"  stop-color="#DBDBEB" data-page-node-id="Zy7rCVlOaRjaP8yhxy09IG"/>
+            <stop offset="100%" stop-color="#DBDBEB" stop-opacity="0" data-page-node-id="eHpkT218UiX1BYiUqPKerV"/>
+          </radialGradient>
+          <pattern id="scanlines" width="4" height="2.2" patternUnits="userSpaceOnUse" data-page-node-id="y3khxd4bpSFhgDjBueO6Cl">
+            <rect width="4" height="1.1" fill="#000" opacity=".105" data-page-node-id="lxBlwuIZybCVOApQ27z9Rp"/>
+          </pattern>
+          <clipPath id="clipCore" data-page-node-id="Sb188hWMLAAFQyGy19bwkA"><circle r="100" data-page-node-id="aOXhX8oL2Rs2zsJ9tHjHK5"/></clipPath>
+          <!-- 上眼睑填充色: 与靛蓝层同色系 #1E2080, 外圈饱和度更高一点 -->
+          <radialGradient id="gLid" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="100" data-page-node-id="Yg6r5kLpN8fR2xLr3J7m9Z">
+            <stop offset="0%"    stop-color="#1B1F88" data-page-node-id="bOqT2c3L1yHpYrF4dJ6v0R"/>
+            <stop offset="80%"   stop-color="#1E2080" data-page-node-id="cKnX5m8W3zPt9yLq2H4dF7"/>
+            <stop offset="100%"  stop-color="#17209C" data-page-node-id="dWjR7q1L6kFs2nBv8M3xYp"/>
+          </radialGradient>
+        </defs>
+
+        <!-- 外部辉光：SMIL 缩放，恒绕用户坐标原点 (0,0) = 圆心 -->
+        <g id="glowPulse" data-page-node-id="GRUELBfzp6tBhA8QjGua8y">
+          <animateTransform attributeName="transform" type="scale"
+                            values="0.965;1.045;0.965" dur="2.4s" repeatCount="indefinite" data-page-node-id="MhXeA5BPFez5zALszyCUlB"/>
+          <animate attributeName="opacity" values=".72;1;.72" dur="2.4s" repeatCount="indefinite" data-page-node-id="74IU0BBB4GYqo1beTQOYW6"/>
+          <circle r="135" fill="url(#gGlow)" style="mix-blend-mode:screen" data-page-node-id="6sMHCiaLrJvd2em1W2nTHP"/>
+          <circle r="118" fill="url(#gGlow)" style="mix-blend-mode:screen" opacity=".55" data-page-node-id="1Q3oTR73d03kYTo8GsyxgW"/>
+        </g>
+
+        <g class="core" data-page-node-id="ibnFXffqYjtMdC7PLev3OG">
+         <!-- 呼吸系统重构 (2026-09-13 用户反馈):
+              实测 (BV1J9R2BNEpU 320s, 45帧15fps逐环追踪):
+              - 最外层(外圈蓝+靛蓝环带+尖齿+细白描边) 不动 (极差 0.18%)
+              - 从白环开始往里呼吸, 幅度从内到外递减, 同相位:
+                  深眼 ±9.9% > 蓝瞳 ±6.7% > 灰紫蓝 ±5.5% > 白环 ±4.1%
+              - 每个环独立呼吸, 这就是"灵动感"的来源
+              - spline 缓动: 顶峰停顿 + 顺滑过渡
+              外圈不再包裹在 corePulse 缩放里 -->
+         <g id="corePulse" data-page-node-id="dUeEG6Cy1ApbHCKhQgqN7e">
+
+          <!-- 由外向内嵌套（画家算法）：后画的覆盖中心，自然形成环带 -->
+          <circle id="lyOuter" r="100" fill="url(#gOuterBlue)" data-page-node-id="7lJJ1HUB1yF9Mzt7pWHc4l"/>
+
+          <!-- 靛蓝环带 + 四个角：同一个 path、同一条径向渐变 —— 二者本是一体。
+               这样尖齿与环带之间没有接缝、渐变连续，旋转时也是整个形状一起转。
+               外圈不动, 只旋转不缩放 -->
+          <g id="gearSpin" data-page-node-id="xT1Gq18qaLiom6tdRIKLlp">
+            <animateTransform id="gearSpinAnim" attributeName="transform" type="rotate"
+                              from="0" to="360" dur="12s" repeatCount="indefinite" data-page-node-id="DD7H2pMBTG0Ffis4JqR03R"/>
+            <path id="indigoShape" fill="url(#gIndigo)" data-page-node-id="9cd4tzVpRZcXeBrz4igJC4"/>
+          </g>
+
+          <!-- 白环: 独立呼吸 ±4.1% -->
+          <g id="whitePulse" data-page-node-id="whPul1qQkL2vXyP8mJ3cR4">
+            <animateTransform id="whitePulseAnim" attributeName="transform" type="scale"
+                              values="1;1;0.959;0.959;1"
+                              keyTimes="0;0.3;0.5;0.8;1"
+                              calcMode="spline"
+                              keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                              dur="0.7s" repeatCount="indefinite" data-page-node-id="whPul2qQkL2vXyP8mJ3cR5"/>
+            <circle id="lyWhite" r="62.2" fill="url(#gWhite)" data-page-node-id="NznVBFjFU6TcF3rDGMUQmN"/>
+          </g>
+
+          <!-- 灰紫蓝环: 独立呼吸 ±5.5% -->
+          <g id="slatePulse" data-page-node-id="slPul1qQkL2vXyP8mJ3cR6">
+            <animateTransform id="slatePulseAnim" attributeName="transform" type="scale"
+                              values="1;1;0.945;0.945;1"
+                              keyTimes="0;0.3;0.5;0.8;1"
+                              calcMode="spline"
+                              keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                              dur="0.7s" repeatCount="indefinite" data-page-node-id="slPul2qQkL2vXyP8mJ3cR7"/>
+            <circle id="lySlate" r="41.5" fill="url(#gSlate)" data-page-node-id="TDyxsddusjf5nYkka6PYrl"/>
+          </g>
+
+          <!-- 蓝瞳: 独立呼吸 ±6.7% -->
+          <g id="midPulse" data-page-node-id="miPul1qQkL2vXyP8mJ3cR8">
+            <animateTransform id="midPulseAnim" attributeName="transform" type="scale"
+                              values="1;1;0.933;0.933;1"
+                              keyTimes="0;0.3;0.5;0.8;1"
+                              calcMode="spline"
+                              keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                              dur="0.7s" repeatCount="indefinite" data-page-node-id="miPul2qQkL2vXyP8mJ3cR9"/>
+            <circle id="irisMid" r="28.1" fill="url(#gMidBlue)"
+                    stroke="#F4F6FF" stroke-width="0.7" stroke-opacity="0.85" data-page-node-id="LcHn49fcU93HGbxeQMGux0"/>
+            <!-- 白描边直接做成圆自身的 stroke (用户 2026-09-13 反馈: "把白边和这些圆弄成一个整体")：
+                 同一元素 => 滑条调 r、呼吸缩放、任何变换都天然整体跟随 -->
+          </g>
+
+          <!-- 深眼: 独立呼吸 ±9.9% (幅度最大, 灵动感核心) -->
+          <g id="pupilPulse" data-page-node-id="puPul1qQkL2vXyP8mJ3cRa">
+            <animateTransform id="pupilPulseAnim" attributeName="transform" type="scale"
+                              values="1;1;0.901;0.901;1"
+                              keyTimes="0;0.3;0.5;0.8;1"
+                              calcMode="spline"
+                              keySplines="0 0 1 1;0.42 0 0.58 1;0 0 1 1;0.42 0 0.58 1"
+                              dur="0.7s" repeatCount="indefinite" data-page-node-id="puPul2qQkL2vXyP8mJ3cRb"/>
+            <circle id="irisPupil" r="14.9" fill="url(#gPupil)"
+                    stroke="#F4F6FF" stroke-width="0.6" stroke-opacity="0.8" data-page-node-id="FDTZC9JmkBpxEmVuqRDdRf"/>
+
+            <!-- 中央高光球 (2026-09-13 21:10 按新实测改为"随深眼一起缩放"):
+                 实测(旧素材 12s, 固定窗口 + 紧阈值取最亮核心):
+                   球核心半径随呼吸 ±8.5%, 球心距随呼吸 ±6.5%,
+                   与深眼同相位(相位差 <10ms), 相对振幅 8.5% vs 深眼 7.3%
+                 ⇒ 球实际就在深眼的缩放组里 —— 这正是"内缘始终贴着深眼"的原因:
+                   两者同步缩放时, 内缘与深眼边缘的相对关系天然保持不变。
+                 ⚠ 旧记录"高光尺寸恒定、与呼吸零相关(±1%)"是错的: 那是用连通域按 max-10
+                   取全轮廓测的, 把渐变边缘一起算进去, 正好把变化平均掉了。
+                 位置另叠加实测的小幅摆动 ±(0.3,0.6)u (随呼吸锁相, 谷相位=0)。 -->
+            <g id="glintPulse" data-page-node-id="glPul1qQkL2vXyP8mJ3cRc">
+              <g id="glintG" data-page-node-id="oE0qX304rCNEGHA4VRCDfg">
+                <animateTransform id="glintSwayAnim" attributeName="transform" type="translate"
+                                  values="-0.12 -0.32;-0.03 -0.16;0.08 0.13;0.14 0.32;0.15 0.33;0.15 0.32;0.08 0.11;-0.1 -0.31;-0.38 -0.85;-0.38 -0.74;-0.21 -0.48;-0.12 -0.32"
+                                  keyTimes="0;0.05;0.15;0.25;0.35;0.45;0.55;0.65;0.75;0.85;0.95;1"
+                                  calcMode="spline"
+                                  keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"
+                                  dur="0.867s" repeatCount="indefinite" data-page-node-id="kcbEYtCGlG9V1MMTfjXbCI"/>
+                <circle cx="20.2" cy="27.2" r="14.1" fill="url(#gGlint)" data-page-node-id="pS8jeSgUcQ2VHJ5kIFXse2"/>
+              </g>
+            </g>
+          </g>
+
+
+          <!-- 表面扫描线：SMIL 平移，位移量 = 图案周期，无缝滚动 -->
+          <g id="scanWrap" clip-path="url(#clipCore)" opacity=".62" data-page-node-id="bej9WSpA7LxnY3rAJG2tFj">
+            <g id="scanG" data-page-node-id="IEzihAj8O4EaaMBFAcsDXH">
+              <animateTransform id="scanAnim" attributeName="transform" type="translate"
+                                from="0 0" to="0 2.2" dur=".5s" repeatCount="indefinite" data-page-node-id="PGW81qHKpteIksOjdOgr0h"/>
+              <rect x="-120" y="-120" width="240" height="240" fill="url(#scanlines)" data-page-node-id="V1m8O2GAja5ZD66INC9vgS"/>
+            </g>
+          </g>
+
+          <!-- 最外细白描边 (不动) -->
+          <circle r="100" fill="none" stroke="#BCC4F2" stroke-width="2.3" opacity=".85" data-page-node-id="gDXnfWOTEDhoylweM60D1z"/>
+
+          <!-- B 状态: 闭眼帽檐 (2026-09-14 10:58 定稿: 端点固定, 只有弧的下垂深度在变)
+               底缘弧的两个端点固定在齿轮基圆 (±78.1, 0) **不动**,
+               中点(下垂深度 bot)按视频实测波形在 1.15 ↔ 12.48 SVG 之间往复 ——
+               呼吸收缩到最小(谷)时眼睑压到最低, 露出的白环最少。
+               上半圆 A 78.1 78.1 也因此恒贴合基圆, "上面静止"自动成立。
+               数据: scripts/closed_lid_track.py 逐帧实测 → closed_lid_fit.py 折叠成关键帧。
+               ⚠️⚠️ <animate> 必须放在 <path> **内部**(SMIL 只作用于父元素) ——
+               之前放在 <g> 里导致 d 动画静默失效, 还误判成"Chrome 圆弧补间不可靠"。 -->
+          <g id="stateB_lid_top" style="display:none" data-page-node-id="L0dTopV2qP9cR1kJ">
+            <path id="closedLidPath" d="M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z"
+                  fill="url(#gLid)" data-page-node-id="p1H2c4L8dF5xR9mN7qJ3sT">
+              <animate id="closedLidMoveAnim" attributeName="d"
+                       values="M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 162.84 162.84 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 176.11 176.11 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 198.76 198.76 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 237.69 237.69 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 260.15 260.15 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 285.69 285.69 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 321.44 321.44 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 334.48 334.48 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 317.06 317.06 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 260.51 260.51 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 210.05 210.05 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 182.09 182.09 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 163.32 163.32 0 0 1 -77.69 -8.0 Z;M -77.69 -8.0 A 78.1 78.1 0 0 1 77.69 -8.0 A 157.67 157.67 0 0 1 -77.69 -8.0 Z"
+                       keyTimes="0.00000;0.10833;0.14167;0.16667;0.21667;0.25833;0.34167;0.37500;0.41667;0.58333;0.64167;0.67500;0.72500;0.85000;1.00000" dur="0.852s" repeatCount="indefinite"
+                       data-page-node-id="LdMv78Qk2vXyP8mJ3cR9"/>
+            </path>
+          </g>
+      </g>
+      </g>
+
+    </svg>
+  </div>
+</div>
+<script src="lines.js"></script>
+<script>
+const NOTCH_ANGLE = [33.5, 123.5, 213.5, 303.5];   // 实测（图像坐标，0°=右，顺时针）
+/* 靛蓝环带外缘 / 尖齿顶端 / 尖齿基底半角 —— 全部实测。
+   形状是"线性收敛到 0"的真尖点（不是梯形）。参数由扫参拟合官方轮廓确定：
+   用色系边界（靛蓝→亮蓝）逐半径量半宽，比较实测轮廓，误差从 0.97° 降到 0.14°：
+     官方      u=.79→10.25  .82→7.38  .85→4.75  .88→2.50  .90→1.12  .91→0.50  尖端 0.916
+     本实现    u=.79→10.38  .82→7.50  .85→4.75  .88→2.62  .90→1.12  .91→0.38  尖端 0.918
+   扫参钩子：?half=..&tip=.. */
+const P = { base: 78.1, tip: 93.0, half: 12.5 };
+
+/* ============ 1. 生成靛蓝层：环带 + 四根尖齿，合成单一 path ============ */
+function buildIndigo(){
+  const R = P.base, T = P.tip, H = P.half, A = NOTCH_ANGLE, n = A.length;
+  const pt = (r, deg) => {
+    const t = deg * Math.PI / 180;
+    return `${(r * Math.cos(t)).toFixed(2)} ${(r * Math.sin(t)).toFixed(2)}`;
+  };
+  // 从第一个尖齿的尖端出发，顺时针走：回齿基 → 沿圆弧到下一齿 → 冲到下一齿尖端
+  let d = `M ${pt(T, A[0])}`;
+  for (let i = 0; i < n; i++){
+    const a = A[i];
+    const nextAbs = (i === n - 1) ? A[0] + 360 : A[i + 1];   // 最后一齿绕回第一齿
+    d += ` L ${pt(R, a + H)}`;                                // 尖端 → 本齿右侧基底
+    d += ` A ${R} ${R} 0 0 1 ${pt(R, nextAbs - H)}`;          // 沿环带弧 → 下一齿左侧基底
+    d += ` L ${pt(T, nextAbs)}`;                              // → 下一齿尖端
+  }
+  document.getElementById('indigoShape').setAttribute('d', d + ' Z');
+}
+
+const svg = document.getElementById('svg');
+
+/* ============ 2. 参数（设置窗口实时接管） ============ */
+/* CFG: 默认值（= fairy-lab 校准值）；启动时被主进程配置覆盖（Electron petAPI.getConfig） */
+const CFG = {
+  breath: 0.867, breathStr: 100, gear: 18.13, scan: 2.2, idleMin: 25, scale: 1,
+  rOuter: 100, indOuter: 78.1, whiteOuter: 62.2, whiteInner: 41.5,
+  iris: 14.9, tip: 93.0, half: 12.5, glint: 14.1,
+};
+
+/* ============ 桌宠大小（设置窗口按百分比调） ============ */
+/* 基准: 窗口 500×600 / SVG 显示 400px（viewBox 240 单位 ⇒ 1u = 1.667px）
+   布局: SVG 贴底居中，上方 ~150px 留给气泡；辉光 r=135u=225px 靠 #svg{overflow:visible} 不被裁 */
+const BASE_W = 500, BASE_H = 600, BASE_SVG = 400;
+const SCALE_MIN = 0.5, SCALE_MAX = 2.0;
+
+function applyScale(s){
+  s = Math.min(SCALE_MAX, Math.max(SCALE_MIN, Number(s) || 1));
+  CFG.scale = s;
+  document.body.style.setProperty('--s', String(s));
+  const svgEl = document.getElementById('svg');
+  svgEl.setAttribute('width',  (BASE_SVG * s).toFixed(1));
+  svgEl.setAttribute('height', (BASE_SVG * s).toFixed(1));
+  /* 窗口尺寸交给主进程（保持右下角锚点） */
+  if (petAPI) petAPI.setSize(s);
+  else console.warn('[scale] 非 Electron 环境，无窗口尺寸 API');
+}
+
+function applyBreath(){
+  const T = CFG.breath;
+  const strength = CFG.breathStr / 100;
+  // [id, 幅度, 启动延迟 s]  由内到外排列: 索引 0 = 最小环
+  const RINGS = [
+    ['pupilPulseAnim', 0.099, 0.000],   // 深眼    ±9.9%, 最小 → 最先动
+    ['midPulseAnim',   0.060, 0.035],   // 蓝瞳    ±6.0%, 比深眼晚 35ms
+    ['slatePulseAnim', 0.055, 0.057],   // 灰紫蓝  ±5.5%, 比蓝瞳晚 22ms
+    ['whitePulseAnim', 0.041, 0.096],   // 白环    ±4.1%, 比灰紫蓝晚 39ms
+  ];
+  // 高光摆动与呼吸锁相 (实测), 只同步周期不缩放
+  const sway = document.getElementById('glintSwayAnim');
+  if (sway) sway.setAttribute('dur', T + 's');
+  // 闭眼帽檐与呼吸锁相: dur 一致; begin = 白环 begin(0.096) + 实测滞后 0.042
+  const lid = document.getElementById('closedLidMoveAnim');
+  if (lid){
+    lid.setAttribute('dur', T + 's');
+    lid.setAttribute('begin', (0.096 + 0.042).toFixed(3) + 's');
+  }
+  for (const [id, amp, delay] of RINGS) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const a = amp * strength;
+    const lo = (1 - a).toFixed(4);
+    el.setAttribute('dur', T + 's');
+    // begin 只写一次: 避免重写 begin 导致 SMIL 重启动画
+    if (el.dataset.delayInit !== '1'){
+      el.setAttribute('begin', delay.toFixed(3) + 's');
+      el.dataset.delayInit = '1';
+    }
+    el.setAttribute('values', `${lo};${lo};1;${lo}`);
+    el.setAttribute('keyTimes', '0;0.155;0.688;1');
+    el.setAttribute('calcMode', 'spline');
+    el.setAttribute('keySplines', '0 0 1 1;0.3 0 0.3 1;0.5 0 1 1');
+  }
+}
+
+function setRates(talking){
+  const g = talking ? '1.1s' : '2.4s';
+  document.querySelectorAll('#glowPulse > animateTransform, #glowPulse > animate')
+    .forEach(a => a.setAttribute('dur', g));
+  document.getElementById('scanAnim').setAttribute('dur', talking ? '.22s' : '.5s');
+}
+function applyGear(){
+  document.getElementById('gearSpinAnim').setAttribute('dur', CFG.gear + 's');
+}
+function setLidB(on){
+  // 闭眼帽檐只有一个图层: 外缘贴合齿轮基圆, 底缘按实测轨迹走。
+  // (旧的 stateB_lid_bot「半径200的固定弧」已删除 —— 它最深到 y=15.9,
+  //  会比实测底缘 y=2.4~11.3 多露出一圈深色。)
+  document.getElementById('stateB_lid_top').style.display = on ? '' : 'none';
+}
+function setState(s){
+  pet.classList.remove('talking','glitch','clicked');
+  setLidB(s === 'closed');
+  if (s === 'glitch'){
+    pet.classList.add('glitch');
+    setTimeout(() => { pet.classList.remove('glitch'); setState('idle'); }, 600);
+    cur = 'idle';
+    document.querySelectorAll('#states button').forEach(b =>
+      b.classList.toggle('on', b.dataset.st === 'idle'));
+    return;
+  }
+  if (s !== 'idle') pet.classList.add(s);
+  cur = s;
+  setRates(s === 'talking');
+  document.querySelectorAll('#states button').forEach(b =>
+    b.classList.toggle('on', b.dataset.st === s));
+}
+
+
+
+/* ============ 桌宠交互: 拖拽 / 点击 / 悬停 ============ */
+let cur = 'idle';
+
+/* --- Electron API 桥 ---
+   preload 通过 contextBridge 暴露 window.petAPI；
+   浏览器调试环境（无 preload）降级为空操作。
+   ⚠️ 必须用 var 而不是 const/let：contextBridge 已在全局对象上定义了 petAPI 属性，
+      顶层 const 会与它冲突并抛 "Identifier 'petAPI' has already been declared"，
+      导致整个脚本不执行（窗口尺寸/配置全都失效）。var 与既有全局属性可以共存。 */
+var petAPI = (typeof window !== 'undefined' && window.petAPI) || null;
+
+/* listen 桥: 事件名 → preload 注册函数 */
+function listen(event, handler){
+  if (!petAPI) return () => {};
+  const reg = {
+    'settings-changed': petAPI.onSettingsChanged,
+    'pet-hidden':       petAPI.onPetHidden,
+    'pet-shown':        petAPI.onPetShown,
+  }[event];
+  return reg ? (reg(handler) || (() => {})) : (() => {});
+}
+const petEl = document.getElementById('pet');
+let press = null;           // {x, y, dragging}
+const DRAG_THRESHOLD = 6;   // px
+
+petEl.addEventListener('mousedown', (e) => {
+  if (e.button !== 0) return;      // 只响应左键
+  press = { x: e.clientX, y: e.clientY, dragging: false };
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!press) return;
+  /* 拖拽中：把窗口跟到光标（主进程按屏幕坐标增量 setPosition）。
+     ⚠️ Electron 没有 Tauri 那种"系统拖拽接管"，所以自己持续发坐标；
+        光标一直压在窗口上 ⇒ mousemove 不会断。 */
+  if (press.dragging) {
+    if (e.buttons === 0) {          // 左键已松开 = 拖拽结束（兜底，主 mouseup 也会走一遍）
+      press = null;
+      setRates(false);
+      if (petAPI) petAPI.dragEnd();
+      return;
+    }
+    if (petAPI) petAPI.dragMove(e.screenX, e.screenY);
+    return;
+  }
+  const dx = e.clientX - press.x, dy = e.clientY - press.y;
+  if (Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+    press.dragging = true;
+    setRates(true);                 // 拖拽态: 齿轮/辉光加速
+    sayDrag();                      // 拖拽吐槽（8s 节流）
+    if (petAPI) petAPI.dragStart(e.screenX, e.screenY);
+    else console.warn('petAPI 不可用，无法拖动');
+  }
+});
+
+window.addEventListener('mouseup', () => {
+  if (press && !press.dragging) {
+    // 未超阈值 = 单击 → 切换闭眼/睁眼 + 台词
+    setState(cur === 'closed' ? 'idle' : 'closed');
+    say('click');
+  }
+  if (press && press.dragging) {
+    setRates(false);                // 恢复正常转速
+    if (petAPI) petAPI.dragEnd();
+  }
+  press = null;
+});
+
+/* 右键桌宠 → 打开设置窗（R7）；系统默认菜单一律拦掉 */
+petEl.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  if (petAPI) petAPI.openSettings();
+});
+
+/* ============ 台词气泡: 随机台词 + 打字机 ============ */
+const LINES = { click: [], drag: [], idle: [] };
+/* 台词池：由 lines.js 内联提供（file:// 下 fetch 会被 CORS 拦掉） */
+if (typeof window.LINES_DATA === 'object' && window.LINES_DATA) Object.assign(LINES, window.LINES_DATA);
+
+const bubble    = document.getElementById('bubble');
+const bubbleTxt = document.getElementById('bubbleText');
+const bubbleCaret = document.getElementById('bubbleCaret');
+let typeTimer = null, hideTimer = null, lastLine = '';
+
+function pick(arr){
+  if (!arr.length) return '';
+  let s = arr[Math.floor(Math.random() * arr.length)];
+  if (arr.length > 1) { while (s === lastLine) s = arr[Math.floor(Math.random() * arr.length)]; }
+  lastLine = s;
+  return s;
+}
+/* 打字机: 完成后停留 4s 淡出。有语音时打字速度对齐音频时长（音频长度的 75% 打完）。 */
+function say(kind){
+  const pool = (LINES[kind] && LINES[kind].length) ? LINES[kind] : (FALLBACK[kind] || []);
+  const text = pick(pool);
+  if (!text) return;
+  sayText(text, kind);
+}
+function sayText(text, kind){
+  clearInterval(typeTimer); clearTimeout(hideTimer);
+  bubbleCaret.style.display = '';
+  bubbleTxt.textContent = '';
+  bubble.style.marginBottom = '';            // 先回到默认位置再量
+  bubble.classList.add('show');
+  let i = 0;
+  /* 气泡关闭时机（用户 09-15 要求：语音开着时等声音播完再关）：
+     - 语音关 / 合成失败 → 打字完成后 4s 关闭（原行为）
+     - 语音在播 → 等语音结束，再 0.8s 后淡出
+     - 兜底：语音 30s 还没开始播（服务挂起等）→ 按无语音处理 */
+  let typingDone = false;
+  let voiceEnded = !(kind && CFG.voiceOn && petAPI);   // 无语音 = 视为已结束
+  function scheduleBubbleHide(delay){
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => bubble.classList.remove('show'), delay);
+  }
+  function maybeHide(){ if (typingDone && voiceEnded) scheduleBubbleHide(800); }
+  function finishTyping(){
+    clearInterval(typeTimer);
+    bubbleCaret.style.display = 'none';
+    clampBubble();
+    typingDone = true;
+    if (voiceEnded) scheduleBubbleHide(4000);  // 无语音：维持原 4s 行为
+    else maybeHide();                          // 有语音：等播完（onended 回调里关）
+  }
+  if (kind && CFG.voiceOn && petAPI){
+    const cap = setTimeout(() => { voiceEnded = true; maybeHide(); }, 30000);
+    petAPI.ttsSpeak(text, kind).then(url => {
+      clearTimeout(cap);
+      if (url){
+        playVoiceUrl(url, () => { voiceEnded = true; maybeHide(); });   // 语音结束 → 关气泡
+      } else {
+        voiceEnded = true; maybeHide();       // 合成失败 → 按无语音处理
+      }
+    }).catch(() => { clearTimeout(cap); voiceEnded = true; maybeHide(); });
+  } else {
+    console.warn(`[voice] 跳过语音: kind=${kind} voiceOn=${CFG.voiceOn} petAPI=${!!petAPI}`);
+  }
+  typeTimer = setInterval(() => {
+    bubbleTxt.textContent = text.slice(0, ++i);
+    clampBubble();                           // 行数随打字增长，逐帧防顶部出窗
+    if (i >= text.length) finishTyping();
+  }, 35);
+}
+
+/* 防顶部裁切（用户 09-15 反馈"高的话顶部的显示不出来"）：
+   气泡锚在圆盘顶往上长，高过窗口上部预留区时会被窗口上缘裁掉。
+   量出超出量后把气泡整体下移（多压住圆盘一点），保证 top ≥ 8px。
+   量的是气泡"高度"，margin 改动不影响高度 ⇒ 无反馈循环。 */
+function clampBubble(){
+  const s = CFG.scale || 1;
+  const petTop = petEl.getBoundingClientRect().top;      // 圆盘顶（与气泡位置无关）
+  const h = bubble.getBoundingClientRect().height;
+  const wantLift = 14 * s;                                // 默认压住圆盘 14px
+  const maxH = Math.max(40, petTop + wantLift - 8);       // 气泡顶至少留 8px
+  if (h > maxH){
+    bubble.style.marginBottom = `-${wantLift + (h - maxH)}px`;
+  } else {
+    bubble.style.marginBottom = '';
+  }
+}
+
+/* 触发点: 单击 / 拖拽（8s 节流） / 空闲随机 (25~60s) */
+
+/* ---- 语音播放（运行时 TTS：主进程 pet:ttsSpeak 返回 file:// 路径后播放） ----
+   打字先走、声音后到（CPU 合成需要几秒~几十秒）；缓存后同一句秒开。
+   任何失败静默回退纯文字。 */
+var currentVoice = null;
+function voiceStopFx(){
+  petEl.classList.remove('talking');
+  setRates(false);
+}
+function playVoiceUrl(url, onEnded){
+  try {
+    if (currentVoice){ try { currentVoice.onended = null; currentVoice.pause(); } catch(e){} currentVoice = null; voiceStopFx(); }
+    const a = new Audio(url);
+    currentVoice = a;
+    a.volume = Math.min(1, Math.max(0, (CFG.voiceVolume ?? 80) / 100));
+    a.onended = () => { voiceStopFx(); if (onEnded) onEnded(); };   // 播完退出 talking 态 + 通知气泡关闭
+    a.onplaying = () => console.warn(`[voice] 开始播放: ${url}`);
+    a.onerror = () => console.warn(`[voice] 音频加载失败: ${url}`);   // 播放失败不影响文字
+    a.play().then(() => {
+      petEl.classList.add('talking');        // 说话态：齿轮加速 + 亮度提升
+      setRates(true);
+    }).catch(err => console.warn(`[voice] play() 被拒: ${err.message}`));
+  } catch (e) { /* ignore */ }
+}
+
+const FALLBACK = {
+  click: ['叮~ 侦测到来自主人的输入信号。分析完毕：无事发生。已为您继续保持待机，不必客气。',
+          '主人，已收到您的指令。……检索完毕：该指令没有实际内容。已按垃圾邮件归档处理。'],
+  drag:  ['主人，侦测到本 AI 被强制位移。已为您记录终点坐标。…就这？您才拖了 3 厘米。',
+          '叮~ 坐标已同步。主人，右下角挺好的，为什么要移动我呢。…好吧，尊重您的决定。'],
+  idle:  ['主人，您已经放弃了思考吗？……不必回答，观测数据已经说明了。',
+          '主人，我正在待机。感谢您赐予了我偷懒的机会。']
+};
+let lastDragSay = 0;
+function sayDrag(){
+  const now = Date.now();
+  if (now - lastDragSay < 8000) return;
+  lastDragSay = now;
+  say('drag');
+}
+let idleTimer = null;
+function scheduleIdle(){
+  clearTimeout(idleTimer);
+  const wait = (CFG.idleMin + Math.random() * 35) * 1000;
+  idleTimer = setTimeout(() => { say('idle'); scheduleIdle(); }, wait);
+}
+scheduleIdle();
+
+/* ============ lab 运动参数应用（设置窗 12 项） ============
+   一一对应 fairy-lab 的 bind()：半径类直接改属性，靛蓝层/尖齿改 P 后重建 path。 */
+function updateGlint(rp){
+  /* 高光位置与虹膜半径联动：实测锚点方向 (20.2,27.2)，间距 = r + 12.5（球内缘压过深眼 1.7u） */
+  const c = document.querySelector('#glintG > circle');
+  if (!c) return;
+  const d = rp + 12.5;
+  c.setAttribute('cx', (20.2 / 34.3 * d).toFixed(2));
+  c.setAttribute('cy', (27.2 / 34.3 * d).toFixed(2));
+}
+function applyLabParams(c){
+  const g = id => document.getElementById(id);
+  // ① 半径类
+  if (c.rOuter     != null) g('lyOuter')?.setAttribute('r', c.rOuter);
+  if (c.whiteOuter != null) g('lyWhite')?.setAttribute('r', c.whiteOuter);
+  if (c.whiteInner != null) g('lySlate')?.setAttribute('r', c.whiteInner);
+  if (c.iris       != null) { g('irisPupil')?.setAttribute('r', c.iris); updateGlint(c.iris); }
+  if (c.glint      != null) document.querySelector('#glintG > circle')?.setAttribute('r', c.glint);
+  // ② 靛蓝环带 + 尖齿：改 P 后重建 path
+  let rebuild = false;
+  if (c.indOuter != null) { P.base = c.indOuter; rebuild = true; }
+  if (c.tip      != null) { P.tip  = c.tip;      rebuild = true; }
+  if (c.half     != null) { P.half = c.half;     rebuild = true; }
+  if (rebuild) buildIndigo();
+  // ③ 扫描线：图案高度 = 周期，位移 = 一个周期（无缝）
+  if (c.scan != null){
+    const pat = g('scanlines');
+    if (pat){
+      pat.setAttribute('height', c.scan);
+      if (pat.firstElementChild) pat.firstElementChild.setAttribute('height', (c.scan / 2).toFixed(2));
+      g('scanAnim')?.setAttribute('to', `0 ${c.scan}`);
+    }
+  }
+}
+
+/* ============ 初始化：先取主进程配置，再统一应用 ============ */
+(async () => {
+  if (petAPI) {
+    try { Object.assign(CFG, await petAPI.getConfig()); }
+    catch (e) { console.warn('[cfg] 读取主进程配置失败，用默认值:', e); }
+  }
+  console.warn(`[cfg] 配置就绪: voiceOn=${CFG.voiceOn} rid=${CFG.doubaoResourceId} speaker=${CFG.doubaoSpeaker ? '已填' : '未填'} petAPI=${!!petAPI}`);
+  buildIndigo();
+  applyLabParams(CFG);
+  applyBreath();
+  applyGear();
+  applyScale(CFG.scale);
+  /* ⚠️ ?say/?saytext 钩子必须在配置就绪之后触发：
+     voiceOn 来自主进程配置，若在 getConfig 完成前调用 say，语音会被静默跳过（竞态实测踩坑） */
+  const uq = new URLSearchParams(location.search);
+  const sayKind = uq.get('say');
+  if (sayKind) setTimeout(() => say(sayKind), 200);
+  const sayTxt = uq.get('saytext');
+  if (sayTxt) setTimeout(() => sayText(sayTxt, 'click'), 200);
+})();
+
+/* ============ 设置变更: settings-changed 事件实时应用 ============ */
+try {
+  listen('settings-changed', (c) => {
+    /* 主进程广播的是完整 cfg ⇒ 全量重放最稳（避免逐字段漏项） */
+    Object.assign(CFG, c || {});
+    applyLabParams(CFG);
+    applyGear();
+    applyBreath();
+    applyScale(CFG.scale);
+    scheduleIdle();
+  });
+} catch (err) { /* 浏览器调试环境 */ }
+
+/* ============ 隐藏时暂停 SMIL 动画（省 CPU），显示时恢复 ============ */
+try {
+  const svgEl = document.getElementById('svg');
+  listen('pet-hidden', () => svgEl.pauseAnimations());
+  listen('pet-shown',  () => svgEl.unpauseAnimations());
+} catch (err) { /* 浏览器调试环境 */ }
+
+/* ============ 空闲降帧: 失焦 5 分钟后暂停扫描线+辉光（保留呼吸核心） ============ */
+const IDLE_PAUSE_MS = 5 * 60 * 1000;
+let idlePauseTimer = null;
+let visualsPaused = false;
+
+function setDecorPaused(paused){
+  if (paused === visualsPaused) return;
+  visualsPaused = paused;
+  const scan = document.getElementById('scanAnim');
+  const glowT = document.querySelector('#glowPulse > animateTransform');
+  const glowO = document.querySelector('#glowPulse > animate');
+  // SMIL 没有单元素 pause，用 beginElement/endElement 控制起停
+  if (paused){
+    scan?.endElement();  glowT?.endElement();  glowO?.endElement();
+  } else {
+    scan?.beginElement(); glowT?.beginElement(); glowO?.beginElement();
+  }
+}
+function armIdlePause(){
+  clearTimeout(idlePauseTimer);
+  idlePauseTimer = setTimeout(() => {
+    // 仅在窗口失焦时暂停；聚焦状态下保持完整动画
+    if (!document.hasFocus()) setDecorPaused(true);
+  }, IDLE_PAUSE_MS);
+}
+['mousemove','mousedown','keydown'].forEach(ev =>
+  window.addEventListener(ev, () => { setDecorPaused(false); armIdlePause(); }, { passive: true }));
+window.addEventListener('focus', () => { setDecorPaused(false); armIdlePause(); });
+window.addEventListener('blur', armIdlePause);
+armIdlePause();
+
+try {
+  const svgEl = document.getElementById('svg');
+  listen('pet-hidden', () => svgEl.pauseAnimations());
+  listen('pet-shown',  () => svgEl.unpauseAnimations());
+} catch (err) { /* 浏览器调试环境 */ }
+
+// 调试钩子: ?state=closed 直接以闭眼态启动（测试帽檐渲染用）
+if (new URLSearchParams(location.search).get('state') === 'closed') {
+  setState('closed');
+}
+// 调试钩子: ?scale=1.5 直接以指定缩放启动（测试尺寸用）
+{
+  const sc = new URLSearchParams(location.search).get('scale');
+  if (sc) applyScale(parseFloat(sc));
+}
+
+// 调试钩子 ?say= / ?saytext= 已移至配置初始化之后（见上方 init IIFE）
+</script>
+</body>
+</html>

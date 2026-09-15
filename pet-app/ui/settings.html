@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="wXBGeXPEHHaDovLaob2uFr">
+<head data-page-node-id="u5WiZYKEPL4gJwxG2V90CR">
+<meta charset="utf-8" data-page-node-id="HL3PGYBTbGG4cwEqxcMIi0">
+<title>FairyPet 设置</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font:13px/1.6 "Segoe UI","Microsoft YaHei",system-ui,sans-serif}
+  body{
+    --panel:#131826; --line:#243049; --txt:#dbe3f5; --dim:#8494b6; --accent:#4b7cf3;
+    background:var(--panel); color:var(--txt);
+    padding:16px 18px; overflow-y:auto;
+  }
+  h1{font-size:14px;margin:0 0 12px;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+  h1 small{font-size:11px;color:var(--dim);font-weight:400}
+  .grp{border:1px solid var(--line); border-radius:9px; padding:10px 13px; margin-bottom:12px}
+  h2{font-size:11px;margin:0 0 7px;color:var(--dim);text-transform:uppercase;letter-spacing:.09em;font-weight:600}
+  label.sl{display:grid;grid-template-columns:104px 1fr 58px;align-items:center;gap:8px;margin:5px 0;font-size:12px}
+  label.sl span{color:var(--dim)}
+  label.sl b{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;font-size:11.5px}
+  input[type=range]{width:100%;accent-color:var(--accent);height:18px}
+  label.ti{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:8px;margin:6px 0;font-size:12px}
+  label.ti span{color:var(--dim)}
+  label.ti input[type=text],label.ti input[type=password]{width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--line);
+    background:rgba(255,255,255,.04);color:var(--txt);font-size:12px;outline:none}
+  label.ti input[type=text]:focus,label.ti input[type=password]:focus{border-color:var(--accent)}
+  label.ti select{width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--line);
+    background:rgba(255,255,255,.04);color:var(--txt);font-size:12px;outline:none}
+  .note{font-size:11px;color:var(--dim);line-height:1.55;margin-top:5px}
+  .row{display:flex;align-items:center;justify-content:space-between;margin:5px 0}
+  .row span{font-size:12px;color:var(--dim)}
+  button{font:12px/1 inherit;padding:6px 11px;border-radius:6px;cursor:pointer;
+         background:transparent;color:var(--txt);border:1px solid var(--line);transition:.13s}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  code{background:rgba(127,127,127,.16);padding:1px 4px;border-radius:3px;font-size:11px}
+  .acts{display:flex;gap:8px;margin-top:4px}
+</style>
+</head>
+<body data-page-node-id="ZscAtG2hnBaDvVt0La1tni">
+<h1 data-page-node-id="DCekvXxBUqZFU6pUBfNMvU">FairyPet 设置 <small data-page-node-id="GHz0zhtaD4znqHArwQSmHR">改动即时生效</small></h1>
+
+<div class="grp" data-page-node-id="Ah9NR0j5GolTxmyoMK7RI0">
+  <h2 data-page-node-id="mfNNcljvATImEmzgmnuzVu">外观</h2>
+  <label class="sl" data-page-node-id="UYG1wCvP4AJmkLUxtZVHWN"><span data-page-node-id="D4RBK6yex2tUSfUC8grJNq">桌宠大小</span><input type="range" id="pScale" min="50" max="200" step="5" value="100" data-page-node-id="j8JEWAiQvrWZ4AGEe0CVsf"><b id="vScale" data-page-node-id="KA914xZiMTbO4Kyq79Re6K">100%</b></label>
+  <div class="note" data-page-node-id="QnZZTiuuzBSI7CRFzTDTdf">整个桌宠等比缩放，窗口同步（右下角为锚点）。范围 50%–200%。</div>
+</div>
+
+<div class="grp" data-page-node-id="GRiTm4GMfMzJrUYFYfrDH2">
+  <h2 data-page-node-id="ftMizGWyWKZPDIechUdg8I">几何（fairy-lab 校准值）</h2>
+  <label class="sl" data-page-node-id="bh6dp9DicyrYy3Bf1dmE5j"><span data-page-node-id="m0ybnzEJ2WmyK4XM5deiuE">外圈蓝外缘</span><input type="range" id="pROuter" min="96" max="104" step="0.5" value="100" data-page-node-id="TBSM4IfOrlDjg5lQBxEmdt"><b id="vROuter" data-page-node-id="w0TzyJpCFVNbCUaTOVrUYV">100.0</b></label>
+  <label class="sl" data-page-node-id="GryzfJJRCupwij48Do1I5F"><span data-page-node-id="tUAGCa1vaQXexB8ImDxWea">靛蓝环带外缘</span><input type="range" id="pIndOuter" min="70" max="86" step="0.5" value="78.1" data-page-node-id="mU0Q7AyfT8pDGYEuw8AgGF"><b id="vIndOuter" data-page-node-id="ZEyBrVGCfO5rCjNkbiKSLv">78.1</b></label>
+  <label class="sl" data-page-node-id="2w40rtDAMdaLMFMCjq4F7x"><span data-page-node-id="SWdL8aKilPiRqdijHUIQLf">白环外缘</span><input type="range" id="pWhiteOuter" min="56" max="74" step="0.1" value="62.2" data-page-node-id="oAoH2tkMf2PBHVqfzpXOWJ"><b id="vWhiteOuter" data-page-node-id="q4zqsKUpFGwjgtGAiO8710">62.2</b></label>
+  <label class="sl" data-page-node-id="XfxkkjG3rTu7Z5jLTpAiuv"><span data-page-node-id="csCGOG9LF6Jz4ygKzXAMXD">白环内缘</span><input type="range" id="pWhiteInner" min="38" max="52" step="0.5" value="41.5" data-page-node-id="6tkiAigqvqGyGw3uvdX5MY"><b id="vWhiteInner" data-page-node-id="qnCWvmoynPvZqbZPH7BiFB">41.5</b></label>
+  <label class="sl" data-page-node-id="BukizNtomSEmfqXP2MB33K"><span data-page-node-id="Bzh3MMFuWeKCAn3GL8RAmc">虹膜半径</span><input type="range" id="pIris" min="12" max="34" step="0.1" value="14.9" data-page-node-id="Ew2KVomFLgN8FT3MJ7x9Rt"><b id="vIris" data-page-node-id="qwT8PXj4Gw2vyCAcX5VXVl">14.9</b></label>
+  <label class="sl" data-page-node-id="F4kWzXSNCFFSFmZuGTv9zK"><span data-page-node-id="0DGB6lPqItZjnvcaVV6nl3">尖齿顶端半径</span><input type="range" id="pTip" min="80" max="99" step="0.5" value="93" data-page-node-id="pJpFjwYMS1Xz3Z5xaRCGeU"><b id="vTip" data-page-node-id="ykT8Y70SexUxEjYsE9FH8E">93.0</b></label>
+  <label class="sl" data-page-node-id="R6sOrlEnMiVsYVDqAfH5e6"><span data-page-node-id="5ebt4y5tRQmi40MYNTgUUZ">尖齿基底半角°</span><input type="range" id="pHalf" min="4" max="20" step="0.5" value="12.5" data-page-node-id="D5zgshbMEXdiWXz408TuoB"><b id="vHalf" data-page-node-id="ek4QmE3a08ZMsxmCVy9nbv">12.5</b></label>
+  <label class="sl" data-page-node-id="HbsQxc1I71GT5rG3WXgFtv"><span data-page-node-id="CUxEqE5H6fXasEWiQNMb7h">高光半径</span><input type="range" id="pGlint" min="8" max="20" step="0.1" value="14.1" data-page-node-id="obU77hhxYUt9ZFWp8HPzD2"><b id="vGlint" data-page-node-id="pqMGd4t949hmTaLMz44m9u">14.1</b></label>
+  <div class="note" data-page-node-id="J6c3WAwQWi7DyOgHZxUFBJ">单位 = SVG 用户单位（viewBox 240）。靛蓝环带外缘 / 尖齿参数会重建尖齿 path。</div>
+</div>
+
+<div class="grp" data-page-node-id="85lR1Mli3gkCFuHn8tC1ZG">
+  <h2 data-page-node-id="WEt22MFJVWzoynSURb5rCZ">动效</h2>
+  <label class="sl" data-page-node-id="YX2Ez2v9HuhVYmcUFzioZs"><span data-page-node-id="mGBizmCmjOuE637MyWDjf5">呼吸周期 s</span><input type="range" id="pBreath" min="0.3" max="3" step="0.001" value="0.867" data-page-node-id="nYhZyDFT5e3DNaQMfCLYgP"><b id="vBreath" data-page-node-id="FBmQA0xFaU9QXnTwUGBRQi">0.867</b></label>
+  <label class="sl" data-page-node-id="J29jqaObuNjbHmFLoKcpSR"><span data-page-node-id="P6elgDfv8Au4QsDby6OgRk">呼吸强度 %</span><input type="range" id="pBreathStr" min="0" max="200" step="5" value="100" data-page-node-id="R11XvUq0vxMmJCbACJMPh5"><b id="vBreathStr" data-page-node-id="2IWrHxh7BrUFaqLDrw9gTZ">100</b></label>
+  <label class="sl" data-page-node-id="TUOGLUcjZiMz193PTzm8ew"><span data-page-node-id="dHcEDiAvp7yjflHNi7O6yk">齿轮周期 s</span><input type="range" id="pGear" min="6" max="24" step="0.01" value="18.13" data-page-node-id="vnb2ftct7Z9rrfAMkdzwFO"><b id="vGear" data-page-node-id="BRtrncCfQlbbVnfibsOFBf">18.13</b></label>
+  <label class="sl" data-page-node-id="VvBM2ln99RL2yF54ff7vHR"><span data-page-node-id="qyVIsGUEL7fzBA1JzmDABv">扫描线周期 s</span><input type="range" id="pScan" min="1.2" max="6" step="0.1" value="2.2" data-page-node-id="sepqu3e6TvLECPKJipP1Gz"><b id="vScan" data-page-node-id="yalGc46MFJ3V50uAmGvFrV">2.2</b></label>
+  <div class="note" data-page-node-id="CprLGpk8v9MZA3GO1kGXOp">呼吸幅度由内向外递减（深眼 ±9.9% → 白环 ±4.1%），各环带相位阶梯 96ms，均按实测锁定。</div>
+</div>
+
+<div class="grp" data-page-node-id="o98rlDstFBjJ6gEm7iRFM5">
+  <h2 data-page-node-id="YMAD8VwBDPDsoLEXTE4ncZ">台词</h2>
+  <label class="sl" data-page-node-id="WQICemmn2mj5pgeIFlf15B"><span data-page-node-id="oVDKAHMHymvE5BOmp8UzVn">空闲台词间隔</span><input type="range" id="pIdleMin" min="15" max="120" step="5" value="25" data-page-node-id="xC58kmHY0u9E3INhtoWs1P"><b id="vIdleMin" data-page-node-id="Un7uk6qWDhK9Y9LEdd3X1n">25s</b></label>
+  <div class="note" data-page-node-id="ifVNnTB5kzlUQbU9mdZAFZ">实际等待 = 设定值 ~ 设定值+35s 随机。</div>
+</div>
+
+<div class="grp" data-page-node-id="OpCerytZI6vFEIx9fHpxy7">
+  <h2>语音（豆包语音合成）</h2>
+  <div class="row"><span>语音开关</span><button id="btnVoice">开</button></div>
+  <label class="ti"><span>API Key</span><input type="password" id="doubaoApiKey" placeholder="火山控制台 > API Key 管理（只存本机）"></label>
+  <label class="ti"><span>资源 ID</span><select id="doubaoResourceId">
+    <option value="seed-tts-2.0">seed-tts-2.0（音色库音色）</option>
+    <option value="seed-icl-2.0">seed-icl-2.0（声音复刻音色）</option>
+  </select></label>
+  <label class="ti"><span>音色 ID</span><input type="text" id="doubaoSpeaker" placeholder="控制台音色库的音色 ID，或复刻生成的音色 ID"></label>
+  <label class="sl"><span>语速</span><input type="range" id="pSpeechRate" min="-50" max="100" step="5" value="0"><b id="vSpeechRate">0</b></label>
+  <label class="sl"><span>语音音量</span><input type="range" id="pVoiceVol" min="0" max="100" step="5" value="80"><b id="vVoiceVol">80</b></label>
+  <div class="row" style="align-items:center;gap:8px"><span style="font-size:12px;color:var(--dim);white-space:nowrap">测试文本</span><input type="text" id="ttsTestText" value="你好，主人，语音模块测试成功。" style="flex:1"><button id="btnTestTts">▶ 实时试听</button></div>
+  <div class="row"><span id="ttsTestStatus" style="font-size:11px;color:var(--dim)"></span></div>
+  <div class="note">需在火山引擎开通「豆包语音合成大模型」并获取密钥；密钥只保存在本机配置文件。
+  「音色 ID」填音色库里的音色，或你自己的声音复刻音色 ID（此时资源 ID 填 seed-icl-2.0）。
+  同一句合成一次即缓存，第二次秒出；失败自动回退纯文字。
+  <b>关闭开关后完全不调用合成接口</b>（不消耗额度），只显示文字气泡。</div>
+</div>
+</div>
+
+<div class="grp" data-page-node-id="ozbGuVVU6ePUqFHFHHagDV">
+  <h2 data-page-node-id="sdBxKB181QGWctx8RhFSzS">系统</h2>
+  <div class="row" data-page-node-id="xZZLH4V8oM0RS3sq2dZVxL"><span data-page-node-id="2C8Wtmb7abWVoAWhHi2W6S">开机自启</span><button id="btnAutostart" data-page-node-id="EmgiN2196mjnYDubbBpVyq">关闭</button></div>
+  <div class="acts" data-page-node-id="jwI1aUAECby3239t8bT32W">
+    <button id="btnReset" data-page-node-id="FWPkDwTvsuxHGcWuHjjcP1">恢复默认</button>
+    <button id="btnHide" data-page-node-id="DpdT4fNuuCniUK6awuCYOC">隐藏桌宠</button>
+    <button id="btnQuit" data-page-node-id="PktR1fiHzsdoAkxDpyeE7L">退出程序</button>
+  </div>
+  <div class="note" data-page-node-id="Dei9KMFEVL1hd0TtFIKP3Z">快捷键 <code data-page-node-id="uJj2aZGE2RsbNXLarskkmf">Alt+F1</code> 显示/隐藏桌宠；右键桌宠或任务栏图标可再次打开本窗口。</div>
+</div>
+
+<script src="settings.js"></script>
+</body>
+</html>

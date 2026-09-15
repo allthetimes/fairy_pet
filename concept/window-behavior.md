@@ -81,8 +81,10 @@ mouseup    → 位移 ≤ 6px  ⇒ 判定为点击：setState 切换 + say('clic
 | 打字速度 | 35 ms / 字 |
 | 停留时间 | 打字完成后 4 s 自动淡出 |
 | 淡出过渡 | opacity 0.28s |
-| 气泡位置 | 圆盘上方（`bottom: calc(100% - 36px)`），水平居中 |
-| 最大宽度 | 320px，超长自动换行（**不要用 nowrap**，会让长句溢出） |
+| 气泡位置 | 圆盘上方（`bottom:100%` 略压住圆盘），水平居中 |
+| 气泡宽度 | `width:max-content` + `max-width: 440px·s`（09-15 从 320 加宽；⚠️ abspos+left:50% 必须显式 width:max-content，否则收缩宽度被"left 后剩余 200px"卡死，max-width 永不生效） |
+| 防顶部裁切 | `clampBubble()`：打字期间逐帧量高，超高时整体下移（多压圆盘），保证 top ≥ 8px |
+| 最大宽度 | 440px·s，超长自动换行（**不要用 nowrap**，会让长句溢出） |
 | 点击穿透 | `pointer-events: none` —— 气泡显示期间仍可拖拽/点击 |
 | 样式状态 | **临时样式**：深色半透明 + 青蓝描边。等用户提供游戏内截图后仿照重做 |
 
